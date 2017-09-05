@@ -45,7 +45,6 @@ public class BasicFunctionForTests {
 		return conf;
 	}
 	
-	@Test(priority = 1)
 	public void deleteUsedObject(){
 		
 		List<String> namesOfUsers = new ArrayList<String>();
