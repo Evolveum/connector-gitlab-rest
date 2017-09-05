@@ -62,7 +62,7 @@ public class SchemaConsistencyTests extends BasicFunctionForTests {
 				if(attributeInfo.getName().equals("visibility")){
 					attributesGroup.add(AttributeBuilder.build(attributeInfo.getName(),"public"));
 				} else if(attributeInfo.getType().equals(String.class)){
-					attributesGroup.add(AttributeBuilder.build(attributeInfo.getName(),"group145"));
+					attributesGroup.add(AttributeBuilder.build(attributeInfo.getName(),"group145example"));
 				} else if(attributeInfo.getType().equals(Integer.class)){
 					attributesGroup.add(AttributeBuilder.build(attributeInfo.getName(),157));
 				} else if(attributeInfo.getType().equals(Boolean.class)){
@@ -123,7 +123,7 @@ public class SchemaConsistencyTests extends BasicFunctionForTests {
 				if(attributeInfo.getName().equals("visibility")){
 					attributesProject.add(AttributeBuilder.build(attributeInfo.getName(),"public"));
 				} else if(attributeInfo.getType().equals(String.class)){
-					attributesProject.add(AttributeBuilder.build(attributeInfo.getName(),"project897"));
+					attributesProject.add(AttributeBuilder.build(attributeInfo.getName(),"project897example"));
 				} else if(attributeInfo.getType().equals(Integer.class)){
 					attributesProject.add(AttributeBuilder.build(attributeInfo.getName(),113));
 				} else if(attributeInfo.getType().equals(Boolean.class)){
@@ -193,7 +193,7 @@ public class SchemaConsistencyTests extends BasicFunctionForTests {
 				} else if(attributeInfo.getName().equals("email")){
 					attributesAccount.add(AttributeBuilder.build(attributeInfo.getName(),"user21222@test.com"));
 				} else if(attributeInfo.getType().equals(String.class)){
-					attributesAccount.add(AttributeBuilder.build(attributeInfo.getName(),"user21222"));
+					attributesAccount.add(AttributeBuilder.build(attributeInfo.getName(),"user21222example"));
 				} else if(attributeInfo.getType().equals(Integer.class)){
 					attributesAccount.add(AttributeBuilder.build(attributeInfo.getName(),252));
 				} else if(attributeInfo.getType().equals(Boolean.class)){

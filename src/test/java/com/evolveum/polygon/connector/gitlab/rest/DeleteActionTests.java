@@ -98,7 +98,6 @@ public class DeleteActionTests extends BasicFunctionForTests {
 		
 		Set<Attribute> attributesCreatedProject = new HashSet<Attribute>();
 		attributesCreatedProject.add(AttributeBuilder.build("__NAME__","Attack on Casterly Rock"));
-		attributesCreatedProject.add(AttributeBuilder.build("path","CasterlyRock"));
 		
 		ObjectClass objectClassProject = new ObjectClass("Project");
 		

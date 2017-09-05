@@ -81,7 +81,7 @@ public class UpdateTests extends BasicFunctionForTests {
 				} else if(attributeInfo.getName().equals("external")){
 					attributesUpdateAccount.add(AttributeDeltaBuilder.build(attributeInfo.getName(),false));
 				} else if(attributeInfo.getType().equals(String.class)){
-					attributesUpdateAccount.add(AttributeDeltaBuilder.build(attributeInfo.getName(),"user21222"));
+					attributesUpdateAccount.add(AttributeDeltaBuilder.build(attributeInfo.getName(),"user21222example"));
 				} else if(attributeInfo.getType().equals(Integer.class)){
 					attributesUpdateAccount.add(AttributeDeltaBuilder.build(attributeInfo.getName(),252));
 				} else if(attributeInfo.getType().equals(Boolean.class)){
@@ -141,9 +141,6 @@ public class UpdateTests extends BasicFunctionForTests {
 			}
 		}
 		
-//		for(Attribute attr : attributesAccount){
-//			LOGGER.info("XXXXXXXXXXXXXX    "+attr.getName()+"      "+resultsAccount.get(0).getAttributes().contains(attr));
-//		}
 		try {
 			if(!resultsAccount.get(0).getAttributes().containsAll(attributesAccount)){
 				throw new InvalidAttributeValueException("Attributes of created user and searched user is not same.");
@@ -181,7 +178,7 @@ public class UpdateTests extends BasicFunctionForTests {
 				if(attributeInfo.getName().equals("visibility")){
 					attributesUpdateGroup.add(AttributeDeltaBuilder.build(attributeInfo.getName(),"public"));
 				} else if(attributeInfo.getType().equals(String.class)){
-					attributesUpdateGroup.add(AttributeDeltaBuilder.build(attributeInfo.getName(),"group7722"));
+					attributesUpdateGroup.add(AttributeDeltaBuilder.build(attributeInfo.getName(),"group145example"));
 				} else if(attributeInfo.getType().equals(Integer.class)){
 					attributesUpdateGroup.add(AttributeDeltaBuilder.build(attributeInfo.getName(),278));
 				} else if(attributeInfo.getType().equals(Boolean.class)){
@@ -226,9 +223,6 @@ public class UpdateTests extends BasicFunctionForTests {
 			}
 		}
 		
-//		for(Attribute attr : attributesAccount){
-//			LOGGER.info("XXXXXXXXXXXXXX    "+attr.getName()+"      "+resultsAccount.get(0).getAttributes().contains(attr));
-//		}
 		try {
 			if(!resultsGroup.get(0).getAttributes().containsAll(attributesAccount)){
 				throw new InvalidAttributeValueException("Attributes of created group and searched group is not same.");
@@ -265,7 +259,7 @@ public class UpdateTests extends BasicFunctionForTests {
 				if(attributeInfo.getName().equals("visibility")){
 					attributesDeltaUpdateProject.add(AttributeDeltaBuilder.build(attributeInfo.getName(),"public"));
 				} else if(attributeInfo.getType().equals(String.class)){
-					attributesDeltaUpdateProject.add(AttributeDeltaBuilder.build(attributeInfo.getName(),"proj14"));
+					attributesDeltaUpdateProject.add(AttributeDeltaBuilder.build(attributeInfo.getName(),"project897example"));
 				} else if(attributeInfo.getType().equals(Integer.class)){
 					attributesDeltaUpdateProject.add(AttributeDeltaBuilder.build(attributeInfo.getName(),874));
 				} else if(attributeInfo.getType().equals(Boolean.class)){
@@ -314,9 +308,6 @@ public class UpdateTests extends BasicFunctionForTests {
 			}
 		}
 		
-//		for(Attribute attr : attributesProject){
-//			LOGGER.info("XXXXXXXXXXXXXX    "+attr.getName()+"      "+resultsProject.get(0).getAttributes().contains(attr));
-//		}
 		
 		attributesProject.remove(AttributeBuilder.build("default_branch","proj14"));
 		try {

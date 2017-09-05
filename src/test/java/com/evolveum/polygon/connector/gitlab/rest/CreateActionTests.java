@@ -149,12 +149,9 @@ public class CreateActionTests extends BasicFunctionForTests {
 			
 		ObjectClass objectClassGroup = ObjectClass.GROUP;
 		
-		Uid starkUid = gitlabRestConnector.create(objectClassGroup, attributesGroup, options);
 		try {
 			gitlabRestConnector.create(objectClassGroup, attributesGroup, options);
 		} finally {
-			gitlabRestConnector.delete(objectClassGroup, starkUid, options);
-			
 			gitlabRestConnector.dispose();
 		}
 	}
@@ -249,13 +246,9 @@ public class CreateActionTests extends BasicFunctionForTests {
 		
 			
 		ObjectClass objectClassAccount = ObjectClass.ACCOUNT;
-		
-		Uid johnUid = gitlabRestConnector.create(objectClassAccount, attributesAccount, options);
 		try {
 			gitlabRestConnector.create(objectClassAccount, attributesAccount, options);
 		} finally {
-			gitlabRestConnector.delete(objectClassAccount, johnUid, options);
-			
 			gitlabRestConnector.dispose();
 		}
 	}

@@ -18,8 +18,8 @@
 		<relativePath></relativePath>
 	</parent>
 
-	<artifactId>connector-rest-gitlab</artifactId>
-	<version>0.1-SNAPSHOT</version>
+	<artifactId>connector-gitlab-rest</artifactId>
+	<version>1.0</version>
 	<packaging>jar</packaging>
 
 	<name>REST Connector Gitlab</name>
@@ -78,7 +78,6 @@
 		<dependency>
 			<groupId>net.tirasa.connid</groupId>
 			<artifactId>connector-framework</artifactId>
-			<!-- version>1.4.2.19</version-->
 			<version>1.4.3.0-SNAPSHOT</version>
 		</dependency>
 

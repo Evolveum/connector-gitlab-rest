@@ -54,8 +54,8 @@ import org.identityconnectors.framework.spi.operations.UpdateDeltaOp;
 import org.identityconnectors.framework.spi.operations.DeleteOp;
 
 @ConnectorClass(displayNameKey = "connector.gitlab.rest.display", configurationClass = GitlabRestConfiguration.class)
-public class GitlabRestConnector implements TestOp, SchemaOp, Connector, CreateOp, DeleteOp, /*UpdateOp,*/ UpdateDeltaOp,
-		/*UpdateAttributeValuesOp, */SearchOp<Filter> {
+public class GitlabRestConnector implements TestOp, SchemaOp, Connector, CreateOp, DeleteOp, UpdateDeltaOp,
+		SearchOp<Filter> {
 
 	private static final Log LOGGER = Log.getLog(GitlabRestConnector.class);
 	private GitlabRestConfiguration configuration;
