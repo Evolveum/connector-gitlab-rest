@@ -92,12 +92,14 @@ public class GitlabRestConnector implements TestOp, SchemaOp, Connector, CreateO
 	public void dispose() {
 		LOGGER.info("Configuration cleanup");
 		configuration = null;
-		try {
-			httpclient.close();
-		} catch (IOException e) {
-			StringBuilder sb = new StringBuilder();
-			sb.append("It was not possible close httpclient;").append(e.getLocalizedMessage());
-			throw new ConnectorIOException(sb.toString(), e);
+		if (httpclient != null) {
+			try {
+				httpclient.close();
+			} catch (IOException e) {
+				StringBuilder sb = new StringBuilder();
+				sb.append("It was not possible close httpclient;").append(e.getLocalizedMessage());
+				throw new ConnectorIOException(sb.toString(), e);
+			}
 		}
 	}
 

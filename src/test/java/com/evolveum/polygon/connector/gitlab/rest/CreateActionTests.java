@@ -237,9 +237,9 @@ public class CreateActionTests extends BasicFunctionForTests {
 		OperationOptions options = new OperationOptions(new HashMap<String,Object>());
 		
 		Set<Attribute> attributesAccount = new HashSet<Attribute>();
-		attributesAccount.add(AttributeBuilder.build("name","John Snow"));
-		attributesAccount.add(AttributeBuilder.build("email","john.snow@gameofthrones.com"));
-		attributesAccount.add(AttributeBuilder.build("__NAME__","snow"));
+		attributesAccount.add(AttributeBuilder.build("name","John Snow2"));
+		attributesAccount.add(AttributeBuilder.build("email","john.snow2@gameofthrones.com"));
+		attributesAccount.add(AttributeBuilder.build("__NAME__","snow2"));
 		
 		GuardedString pass = new GuardedString("wint".toCharArray());
 		attributesAccount.add(AttributeBuilder.build("__PASSWORD__",pass));

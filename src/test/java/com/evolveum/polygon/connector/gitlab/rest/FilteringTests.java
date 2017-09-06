@@ -52,9 +52,9 @@ public class FilteringTests extends BasicFunctionForTests {
 		OperationOptions options = new OperationOptions(new HashMap<String,Object>());
 		
 		Set<Attribute> attributesFirstCreateAccount = new HashSet<Attribute>();
-		attributesFirstCreateAccount.add(AttributeBuilder.build("name","John Snow ľ,š,č,ť,ž,ý,á,í,é,ô,ú,ň,ä"));
-		attributesFirstCreateAccount.add(AttributeBuilder.build("email","john.snow@gameofthrones.com"));
-		attributesFirstCreateAccount.add(AttributeBuilder.build("__NAME__","snow"));
+		attributesFirstCreateAccount.add(AttributeBuilder.build("name","John Snow7 ľ,š,č,ť,ž,ý,á,í,é,ô,ú,ň,ä"));
+		attributesFirstCreateAccount.add(AttributeBuilder.build("email","john.snow7@gameofthrones.com"));
+		attributesFirstCreateAccount.add(AttributeBuilder.build("__NAME__","snow7"));
 		
 		GuardedString pass = new GuardedString("winteriscoming".toCharArray());
 		attributesFirstCreateAccount.add(AttributeBuilder.build("__PASSWORD__",pass));

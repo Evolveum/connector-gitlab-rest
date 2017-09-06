@@ -18,3 +18,4 @@ scratch/
 test-output/
 target/
 src/test/java/com/evolveum/polygon/connector/gitlab/rest/MyTest.java
+sample/

@@ -18,6 +18,7 @@ package com.evolveum.polygon.connector.gitlab.rest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.identityconnectors.framework.common.objects.ConnectorObject;
 import org.identityconnectors.framework.common.objects.Name;
@@ -26,7 +27,6 @@ import org.identityconnectors.framework.common.objects.OperationOptions;
 import org.identityconnectors.framework.common.objects.SearchResult;
 import org.identityconnectors.framework.common.objects.Uid;
 import org.identityconnectors.framework.spi.SearchResultsHandler;
-import org.testng.annotations.Test;
 
 import com.evolveum.polygon.connector.gitlab.rest.GitlabRestConfiguration;
 
@@ -53,6 +53,9 @@ public class BasicFunctionForTests {
 		namesOfUsers.add("user21222example");
 		for(int i = 0; i < 500; i++){
 			namesOfUsers.add("testUserPer"+i);
+		}
+		for(int i = 2; i < 9; i++){
+			namesOfUsers.add("snow"+i);
 		}
 		
 		List<String> namesOfGroups = new ArrayList<String>();
@@ -84,19 +87,20 @@ public class BasicFunctionForTests {
 		GitlabRestConnector gitlabRestConnector = new GitlabRestConnector();
 		
 		GitlabRestConfiguration conf = getConfiguration();
-		gitlabRestConnector.init(conf);
+		
 		
 		OperationOptions options = new OperationOptions(new HashMap<String,Object>());
 		ObjectClass objectClassAccount = ObjectClass.ACCOUNT;
 		ObjectClass objectClassGroup = ObjectClass.GROUP;
 		ObjectClass objectClassProject = new ObjectClass("Project");
 		
-		final ArrayList<ConnectorObject> results = new ArrayList<>();
+		final ArrayList<ConnectorObject> result = new ArrayList<>();
+		final ArrayList<ConnectorObject> partOfResult = new ArrayList<>();
 		SearchResultsHandler handler = new SearchResultsHandler() {
 
 			@Override
 			public boolean handle(ConnectorObject connectorObject) {
-				results.add(connectorObject);
+				partOfResult.add(connectorObject);
 				return true;
 			}
 
@@ -104,22 +108,66 @@ public class BasicFunctionForTests {
 			public void handleResult(SearchResult result) {
 			}
 		};
+		int i = 1;
+		do{
+			Map<String, Object> operationOptions = new HashMap<String, Object>();
+			operationOptions.put("ALLOW_PARTIAL_ATTRIBUTE_VALUES", true);
+			operationOptions.put(OperationOptions.OP_PAGED_RESULTS_OFFSET, i);
+			operationOptions.put(OperationOptions.OP_PAGE_SIZE, 100);
+			OperationOptions searchOptions = new OperationOptions(operationOptions);
+			partOfResult.clear();
+			gitlabRestConnector.init(conf);
+			gitlabRestConnector.executeQuery(objectClassAccount, null, handler, searchOptions);
+			gitlabRestConnector.dispose();
+			result.addAll(partOfResult);
+			i++;
+		} while(partOfResult.size() == 100);
 		
-		gitlabRestConnector.executeQuery(objectClassAccount, null, handler, options);
-		gitlabRestConnector.executeQuery(objectClassGroup, null, handler, options);
-		gitlabRestConnector.executeQuery(objectClassProject, null, handler, options);
+		i = 1;
+		do{
+			Map<String, Object> operationOptions = new HashMap<String, Object>();
+			operationOptions.put("ALLOW_PARTIAL_ATTRIBUTE_VALUES", true);
+			operationOptions.put(OperationOptions.OP_PAGED_RESULTS_OFFSET, i);
+			operationOptions.put(OperationOptions.OP_PAGE_SIZE, 100);
+			OperationOptions searchOptions = new OperationOptions(operationOptions);
+			partOfResult.clear();
+			gitlabRestConnector.init(conf);
+			gitlabRestConnector.executeQuery(objectClassGroup, null, handler, searchOptions);
+			gitlabRestConnector.dispose();
+			result.addAll(partOfResult);
+			i++;
+		} while(partOfResult.size() == 100);
 		
+		i = 1;
+		do{
+			Map<String, Object> operationOptions = new HashMap<String, Object>();
+			operationOptions.put("ALLOW_PARTIAL_ATTRIBUTE_VALUES", true);
+			operationOptions.put(OperationOptions.OP_PAGED_RESULTS_OFFSET, i);
+			operationOptions.put(OperationOptions.OP_PAGE_SIZE, 100);
+			OperationOptions searchOptions = new OperationOptions(operationOptions);
+			partOfResult.clear();
+			gitlabRestConnector.init(conf);
+			gitlabRestConnector.executeQuery(objectClassProject, null, handler, searchOptions);
+			gitlabRestConnector.dispose();
+			result.addAll(partOfResult);
+			i++;
+		} while(partOfResult.size() == 100);
 		
-		for(ConnectorObject obj : results){
+		for(ConnectorObject obj : result){
 			String nameObj = (String)obj.getAttributeByName(Name.NAME).getValue().get(0);
+			
 			if(namesOfUsers.contains(nameObj)){
+				gitlabRestConnector.init(conf);
 				gitlabRestConnector.delete(objectClassAccount, (Uid)obj.getAttributeByName(Uid.NAME), options);
-			}
-			if(namesOfGroups.contains(nameObj)){
+				gitlabRestConnector.dispose();
+			} else if(namesOfGroups.contains(nameObj)){
+				gitlabRestConnector.init(conf);
 				gitlabRestConnector.delete(objectClassGroup, (Uid)obj.getAttributeByName(Uid.NAME), options);
-			}
-			if(namesOfProjects.contains(nameObj)){
+				gitlabRestConnector.dispose();
+			} else if(namesOfProjects.contains(nameObj)){
+				gitlabRestConnector.init(conf);
 				gitlabRestConnector.delete(objectClassProject, (Uid)obj.getAttributeByName(Uid.NAME), options);
+				gitlabRestConnector.dispose();
 			}
 		}
 		gitlabRestConnector.dispose();

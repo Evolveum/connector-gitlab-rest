@@ -215,6 +215,7 @@ public class ObjectProcessing {
 			StringBuilder sb = new StringBuilder();
 			sb.append("Failed creating result from HttpEntity: ").append(responseEntity).append(";")
 					.append(e.getLocalizedMessage());
+			responseClose(response);
 			throw new ConnectorIOException(sb.toString(), e);
 		}
 	}
@@ -256,6 +257,7 @@ public class ObjectProcessing {
 			StringBuilder sb = new StringBuilder();
 			sb.append("Failed creating result from HttpEntity: ").append(responseEntity).append(";")
 					.append(e.getLocalizedMessage());
+			responseClose(response);
 			throw new ConnectorIOException(sb.toString(), e);
 		}
 	}
@@ -298,6 +300,7 @@ public class ObjectProcessing {
 			StringBuilder sb = new StringBuilder();
 			sb.append("Failed creating result from HttpEntity: ").append(responseEntity).append(";")
 					.append(e.getLocalizedMessage());
+			responseClose(response);
 			throw new ConnectorIOException(sb.toString(), e);
 		}
 	}
@@ -579,9 +582,12 @@ public class ObjectProcessing {
 				&& !JSONObject.NULL.equals(object.get(attrURLName))) {
 
 			HttpEntity responseEntity = null;
+			CloseableHttpResponse response = null;
 			try {
+				
 				URIBuilder uriPhoto = new URIBuilder(String.valueOf(object.get(attrURLName)));
 				URI uri = uriPhoto.build();
+			
 
 				LOGGER.ok("uri: {0}", uri);
 				HttpRequestBase request = new HttpGet(uri);
@@ -602,22 +608,30 @@ public class ObjectProcessing {
 				request.addHeader("PRIVATE-TOKEN", privateToken.toString());
 
 				// execute request
-				CloseableHttpResponse response = execute(request);
+				response = execute(request);
 				LOGGER.info("responsePhoto: {0}", response);
-				processResponseErrors(response);
-				responseEntity = response.getEntity();
-				byte[] byteJPEG = EntityUtils.toByteArray(responseEntity);
-
-				return byteJPEG;
+				
 			} catch (URISyntaxException e) {
 				StringBuilder sb = new StringBuilder();
 				sb.append("It was not possible create URI from UriBuider; ").append(e.getLocalizedMessage());
 				throw new ConnectorException(sb.toString(), e);
+			}
+				
+				processResponseErrors(response);
+				responseEntity = response.getEntity();
+				
+			try{
+				
+				byte[] byteJPEG = EntityUtils.toByteArray(responseEntity);
+				responseClose(response);
+				return byteJPEG;
+				
 			} catch (IOException e) {
 				StringBuilder sb = new StringBuilder();
 				sb.append("It was not possible create byte[] from response entity: ").append(responseEntity).append("; ").append(e.getLocalizedMessage());
+				responseClose(response);
 				throw new ConnectorException(sb.toString(), e);
-			}
+			} 
 		}
 		return null;
 

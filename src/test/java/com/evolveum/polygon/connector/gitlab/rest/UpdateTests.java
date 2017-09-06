@@ -58,9 +58,9 @@ public class UpdateTests extends BasicFunctionForTests {
 		OperationOptions options = new OperationOptions(new HashMap<String,Object>());
 		
 		Set<Attribute> attributesCreateAccount = new HashSet<Attribute>();
-		attributesCreateAccount.add(AttributeBuilder.build("name","John Snow"));
-		attributesCreateAccount.add(AttributeBuilder.build("email","john.snow@gameofthrones.com"));
-		attributesCreateAccount.add(AttributeBuilder.build("__NAME__","snow"));
+		attributesCreateAccount.add(AttributeBuilder.build("name","John Snow4"));
+		attributesCreateAccount.add(AttributeBuilder.build("email","john.snow4@gameofthrones.com"));
+		attributesCreateAccount.add(AttributeBuilder.build("__NAME__","snow4"));
 		
 		GuardedString pass = new GuardedString("winteriscoming".toCharArray());
 		attributesCreateAccount.add(AttributeBuilder.build("__PASSWORD__",pass));
@@ -309,7 +309,7 @@ public class UpdateTests extends BasicFunctionForTests {
 		}
 		
 		
-		attributesProject.remove(AttributeBuilder.build("default_branch","proj14"));
+		attributesProject.remove(AttributeBuilder.build("default_branch","project897example"));
 		try {
 			if(!resultsProject.get(0).getAttributes().containsAll(attributesProject)){
 				throw new InvalidAttributeValueException("Attributes of created project and searched project is not same.");
@@ -393,9 +393,9 @@ public class UpdateTests extends BasicFunctionForTests {
 		OperationOptions options = new OperationOptions(new HashMap<String,Object>());
 		
 		Set<Attribute> attributesCreateAccount = new HashSet<Attribute>();
-		attributesCreateAccount.add(AttributeBuilder.build("name","John Snow"));
-		attributesCreateAccount.add(AttributeBuilder.build("email","john.snow@gameofthrones.com"));
-		attributesCreateAccount.add(AttributeBuilder.build("__NAME__","snow"));
+		attributesCreateAccount.add(AttributeBuilder.build("name","John Snow5"));
+		attributesCreateAccount.add(AttributeBuilder.build("email","john.snow5@gameofthrones.com"));
+		attributesCreateAccount.add(AttributeBuilder.build("__NAME__","snow5"));
 		
 		GuardedString pass = new GuardedString("winteriscoming".toCharArray());
 		attributesCreateAccount.add(AttributeBuilder.build("__PASSWORD__",pass));

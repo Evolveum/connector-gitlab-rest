@@ -104,9 +104,9 @@ public class ProjectPerformanceTests extends BasicFunctionForTests {
 		ObjectClass objectClassAccount = ObjectClass.ACCOUNT;
 		
 		Set<Attribute> attributesAccount = new HashSet<Attribute>();
-		attributesAccount.add(AttributeBuilder.build("name","John Snow"));
-		attributesAccount.add(AttributeBuilder.build("email","john.snow@gameofthrones.com"));
-		attributesAccount.add(AttributeBuilder.build("__NAME__","snow"));
+		attributesAccount.add(AttributeBuilder.build("name","John Snow8"));
+		attributesAccount.add(AttributeBuilder.build("email","john.snow8@gameofthrones.com"));
+		attributesAccount.add(AttributeBuilder.build("__NAME__","snow8"));
 		
 		GuardedString pass = new GuardedString("winteriscoming".toCharArray());
 		attributesAccount.add(AttributeBuilder.build("__PASSWORD__",pass));

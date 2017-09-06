@@ -143,9 +143,9 @@ public class DeleteActionTests extends BasicFunctionForTests {
 		OperationOptions options = new OperationOptions(new HashMap<String,Object>());
 		
 		Set<Attribute> attributesCreatedAccount = new HashSet<Attribute>();
-		attributesCreatedAccount.add(AttributeBuilder.build("name","John Snow"));
-		attributesCreatedAccount.add(AttributeBuilder.build("email","john.snow@gameofthrones.com"));
-		attributesCreatedAccount.add(AttributeBuilder.build("__NAME__","snow"));
+		attributesCreatedAccount.add(AttributeBuilder.build("name","John Snow6"));
+		attributesCreatedAccount.add(AttributeBuilder.build("email","john.snow6@gameofthrones.com"));
+		attributesCreatedAccount.add(AttributeBuilder.build("__NAME__","snow6"));
 		
 		GuardedString pass = new GuardedString("winteriscoming".toCharArray());
 		attributesCreatedAccount.add(AttributeBuilder.build("__PASSWORD__",pass));
