@@ -78,7 +78,10 @@ public class UserProcessing extends ObjectProcessing {
 	private static final String ATTR_ADMIN = "admin";
 	private static final String ATTR_IS_ADMIN = "is_admin";
 	private static final String ATTR_CAN_CREATE_GROUP = "can_create_group";
-	private static final String ATTR_CONFIRM = "confirm";
+        // Fix wrong attribute name for REST API. Old value "confirm" a new one "skip_confirmation"	        
+        private static final String ATTR_CONFIRM = "skip_confirmation";
+        // Add new attribute "skip_reconfirmation" to fix "Update user email address via API fails to change value" https://gitlab.com/gitlab-org/gitlab-ce/issues/17797
+        private static final String ATTR_RECONFIRM = "skip_reconfirmation";
 	private static final String ATTR_EXTERNAL = "external";
 	private static final String ATTR_STATE = "state";
 	private static final String ATTR_LAST_SING_IN_AT = "last_sign_in_at";
@@ -160,8 +163,13 @@ public class UserProcessing extends ObjectProcessing {
 		
 		//createable: TRUE && updateable: FALSE && readable: FALSE
 		AttributeInfoBuilder attrConfirmBuilder = new AttributeInfoBuilder(ATTR_CONFIRM);
-		attrConfirmBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(false).setReadable(false).setReturnedByDefault(false);
+		attrConfirmBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(true).setReadable(false).setReturnedByDefault(false);
 		userObjClassBuilder.addAttributeInfo(attrConfirmBuilder.build());
+                
+                //createable: TRUE && updateable: FALSE && readable: FALSE
+		AttributeInfoBuilder attrReconfirmBuilder = new AttributeInfoBuilder(ATTR_RECONFIRM);
+		attrReconfirmBuilder.setType(Boolean.class).setCreateable(false).setUpdateable(true).setReadable(false).setReturnedByDefault(false);
+		userObjClassBuilder.addAttributeInfo(attrReconfirmBuilder.build());
 		
 		//createable: FALSE && updateable: FALSE && readable: TRUE
 		AttributeInfoBuilder attrAvatarUrlBuilder = new AttributeInfoBuilder(ATTR_AVATAR_URL);
@@ -245,9 +253,13 @@ public class UserProcessing extends ObjectProcessing {
 		putAttrIfExists(attributes, ATTR_LOCATION, String.class, json);
 		putAttrIfExists(attributes, ATTR_IS_ADMIN, Boolean.class, json, ATTR_ADMIN);
 		putAttrIfExists(attributes, ATTR_CAN_CREATE_GROUP, Boolean.class, json);
-		putAttrIfExists(attributes, ATTR_CONFIRM, Boolean.class, json);
-		putAttrIfExists(attributes, ATTR_EXTERNAL, Boolean.class, json);
-
+                putAttrIfExists(attributes, ATTR_EXTERNAL, Boolean.class, json);
+                putAttrIfExists(attributes, ATTR_CONFIRM, Boolean.class, json);
+		
+                if(!create){
+                putAttrIfExists(attributes, ATTR_RECONFIRM, Boolean.class, json);
+                }
+		
 //		for (Attribute attr : attributes) {
 //			if (ATTR_AVATAR.equals(attr.getName())) {
 //				List<Object> vals = attr.getValue();
@@ -269,6 +281,7 @@ public class UserProcessing extends ObjectProcessing {
 		changeStateIfExists(attributes, newUid);
 		
 		if(create){
+
 			
 			for (Attribute attr : attributes) {
 				if (ATTR_SSH_KEYS.equals(attr.getName())) {

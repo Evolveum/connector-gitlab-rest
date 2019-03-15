@@ -120,8 +120,12 @@ public class ObjectProcessing {
 
 		StringBuilder sbHost = new StringBuilder();
 		sbHost.append(this.configuration.getLoginURL()).append(HOST_POSTFIX_API);
-
-		this.uriBuilder = new URIBuilder().setScheme(HTTP_PROTOCOL).setHost(sbHost.toString());
+                // Add https support
+                String protocol=HTTP_PROTOCOL;
+                if(this.configuration.getProtocol()!=null && !this.configuration.getProtocol().isEmpty()){
+                protocol=this.configuration.getProtocol();
+                }
+		this.uriBuilder = new URIBuilder().setScheme(protocol).setHost(sbHost.toString());
 	}
 
 	public void test() {

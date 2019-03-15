@@ -32,12 +32,13 @@ public class GitlabRestConfiguration extends AbstractConfiguration implements St
 
 
 	private String loginUrl;
-	private GuardedString privateToken;
+        private String protocol;
+	private GuardedString privateToken;        
 	private static final Log LOGGER = Log.getLog(GitlabRestConnector.class);
 
 
 
-	@ConfigurationProperty(order = 1, displayMessageKey = "privateToken.display", helpMessageKey = "privateToken.help", required = false, confidential = true)
+	@ConfigurationProperty(order = 1, displayMessageKey = "privateToken.display", helpMessageKey = "privateToken.help", required = true, confidential = true)
 	public GuardedString getPrivateToken() {
 		return privateToken;
 	}
@@ -50,14 +51,24 @@ public class GitlabRestConfiguration extends AbstractConfiguration implements St
 	public void setPrivateToken(GuardedString privateToken) {
 		this.privateToken = privateToken;
 	}
-
-	@ConfigurationProperty(order = 3, displayMessageKey = "loginUrl.display", helpMessageKey = "loginUrl.help", required = false, confidential = false)
+        
+	@ConfigurationProperty(order = 3, displayMessageKey = "loginUrl.display", helpMessageKey = "loginUrl.help", required = true, confidential = false)
 	public String getLoginURL() {
 		return loginUrl;
 	}
 
 	public void setLoginURL(String loginURL) {
 		this.loginUrl = loginURL;
+	}
+        
+        // Add protocol configuration property to support https        
+        @ConfigurationProperty(order = 4, displayMessageKey = "protocol.display", helpMessageKey = "protocol.help", required = false, confidential = false)
+	public String getProtocol() {
+		return protocol;
+	}
+        
+        public void setProtocol(String protocol) {
+		this.protocol = protocol;
 	}
 
 	@Override
@@ -69,14 +80,19 @@ public class GitlabRestConfiguration extends AbstractConfiguration implements St
 		if ("".equals(privateToken)) {
 			throw new ConfigurationException("Private Token cannot be empty.");
 		}
+                
+                if (protocol==null || !(protocol.equals("http") || protocol.equals("https") || protocol.isEmpty())) {
+			throw new ConfigurationException("Protocol should be http or https.");
+		}
 		LOGGER.info("Configuration valid");
 	}
 	
 	@Override
 	public void release() {
 		LOGGER.info("The release of configuration resources is being performed");
-		this.loginUrl = null;
+		this.loginUrl = null;                
 		this.privateToken.dispose();
+                this.protocol = null;
 	}
 
 	@Override
