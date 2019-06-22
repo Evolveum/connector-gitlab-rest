@@ -89,6 +89,9 @@ public class ObjectProcessing {
 	protected static final String PAGE = "page";
 	protected static final String PER_PAGE = "per_page";
 	protected static final String PROJECT_NAME = "Project";
+        
+        protected static final String UPLOAD_URL = "/uploads/-/";
+        protected static final String PROTOCOL_APPENDER = "://";        
 
 	protected static final String ATTR_NAME = "name";
 	protected static final String ATTR_WEB_URL = "web_url";
@@ -588,11 +591,17 @@ public class ObjectProcessing {
 			HttpEntity responseEntity = null;
 			CloseableHttpResponse response = null;
 			try {
-				
-				URIBuilder uriPhoto = new URIBuilder(String.valueOf(object.get(attrURLName)));
-				URI uri = uriPhoto.build();
-			
+                            
+                            String attrURLValue = "";
+                            if (String.valueOf(object.get(attrURLName)).startsWith(UPLOAD_URL)) {
+                                attrURLValue = this.configuration.getProtocol() + PROTOCOL_APPENDER + this.configuration.getLoginURL() + String.valueOf(object.get(attrURLName));
+                            } else {
+                                attrURLValue = String.valueOf(object.get(attrURLName));
+                            }
+                            URIBuilder uriPhoto = new URIBuilder(attrURLValue);
+                            URI uri = uriPhoto.build();
 
+                            
 				LOGGER.ok("uri: {0}", uri);
 				HttpRequestBase request = new HttpGet(uri);
 
