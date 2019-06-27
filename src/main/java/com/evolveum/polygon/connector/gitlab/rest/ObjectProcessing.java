@@ -525,38 +525,39 @@ public class ObjectProcessing {
 			}
 		}
 
-        try {
-            URI uri = uribuilder.build();
-            HttpRequestBase request = new HttpGet(uri);
-            //Get X-Total-Pages
-            totalPages = getTotalPages(request);
+            try {
+                URI uri = uribuilder.build();
+                HttpRequestBase request = new HttpGet(uri);
+                //Get X-Total-Pages
+                HttpRequestBase totalPagesrequest = new HttpGet(uri);
+                totalPages = getTotalPages(totalPagesrequest);
 
-            if (resultIsArray) {
-                if (totalPages == 1) {
-                    return callRequestForJSONArray(request, true);
+                if (resultIsArray) {
+                    if (totalPages == 1) {
+                        return callRequestForJSONArray(request, true);
+                    } else {
+                        JSONArray responce = new JSONArray();
+                        if (options == null || options.getPageSize() == null) {
+                            uribuilder.addParameter(PER_PAGE, "100");
+                        }
+                        for (int i = 0; i < totalPages; i++) {
+                            URI uriPaged = uribuilder.setParameter(PAGE, Integer.toString(i)).build();
+                            HttpRequestBase requestPaged = new HttpGet(uriPaged);
+                            JSONArray responcePaged = callRequestForJSONArray(requestPaged, true);
+                            responce = mergeJSONArrays(responce, responcePaged);
+                        }
+                        return responce;
+
+                    }
                 } else {
-                    JSONArray responce = new JSONArray();
-                    if (options == null || options.getPageSize() == null) {
-                        uribuilder.addParameter(PER_PAGE, "100");
-                    }
-                    for (int i = 0; i < totalPages; i++) {
-                        URI uriPaged = uribuilder.setParameter(PAGE, Integer.toString(i)).build();
-                        HttpRequestBase requestPaged = new HttpGet(uriPaged);
-                        JSONArray responcePaged = callRequestForJSONArray(requestPaged, true);
-                        responce = mergeJSONArrays(responce, responcePaged);
-                    }
-                    return responce;
-
+                    return callRequest(request, true);
                 }
-            } else {
-                return callRequest(request, true);
+            } catch (URISyntaxException e) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("It was not possible create URI from UriBuider:").append(uriBuilder).append(";")
+                        .append(e.getLocalizedMessage());
+                throw new ConnectorException(sb.toString(), e);
             }
-        } catch (URISyntaxException e) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("It was not possible create URI from UriBuider:").append(uriBuilder).append(";")
-                    .append(e.getLocalizedMessage());
-            throw new ConnectorException(sb.toString(), e);
-        }
     }
 
 	protected int getUIDIfExists(JSONObject object, String nameAttr, ConnectorObjectBuilder builder) {

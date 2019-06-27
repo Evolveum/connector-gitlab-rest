@@ -17,12 +17,6 @@ package com.evolveum.polygon.connector.gitlab.rest;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.identityconnectors.common.security.GuardedString;
-import org.identityconnectors.framework.common.exceptions.InvalidAttributeValueException;
-import org.identityconnectors.framework.common.objects.Attribute;
 import org.identityconnectors.framework.common.objects.AttributeBuilder;
 import org.identityconnectors.framework.common.objects.ConnectorObject;
 import org.identityconnectors.framework.common.objects.ObjectClass;
@@ -31,7 +25,6 @@ import org.identityconnectors.framework.common.objects.SearchResult;
 import org.identityconnectors.framework.common.objects.Uid;
 import org.identityconnectors.framework.common.objects.filter.AttributeFilter;
 import org.identityconnectors.framework.common.objects.filter.ContainsFilter;
-import org.identityconnectors.framework.common.objects.filter.EqualsFilter;
 import org.identityconnectors.framework.common.objects.filter.FilterBuilder;
 import org.identityconnectors.framework.spi.SearchResultsHandler;
 import org.testng.annotations.Test;
@@ -79,51 +72,30 @@ public class PagingTest extends BasicFunctionForTests {
 		for(ConnectorObject obj : resultsProject){
 			listUid.add((Uid)obj.getAttributeByName(Uid.NAME));
 		}
+                
+                
+                
+                AttributeFilter containsFilterProjectOneRecord;
+		containsFilterProjectOneRecord = (ContainsFilter) FilterBuilder.contains(AttributeBuilder.build("path", "winCasterlyRock"));
 		
+		final ArrayList<ConnectorObject> resultsAccount = new ArrayList<>();
+		SearchResultsHandler handlerAccount = new SearchResultsHandler() {
 
+			@Override
+			public boolean handle(ConnectorObject connectorObject) {
+				resultsAccount.add(connectorObject);
+				return true;
+			}
+
+			@Override
+			public void handleResult(SearchResult result) {
+			}
+		};
 		
-//		AttributeFilter containsFilterProject1;
-//		containsFilterProject1 = (ContainsFilter) FilterBuilder.contains(AttributeBuilder.build("path", "_.-"));
-//		
-//		resultsProject.clear();
-//		
-//		gitlabRestConnector.executeQuery(objectClassProject, containsFilterProject1, handlerProject, options);
-//		
-//		listUid.clear();
-//		for(ConnectorObject obj : resultsProject){
-//			listUid.add((Uid)obj.getAttributeByName(Uid.NAME));
-//		}
+		gitlabRestConnector.executeQuery(objectClassProject, containsFilterProjectOneRecord, handlerAccount, options);
 		
-//		try {
-//			if(!listUid.contains(casterlyRockUid)){
-//				throw new InvalidAttributeValueException("ContainsFilter not return group with special characters(_.-).");
-//			}
-//		} catch (Exception e) {
-//			gitlabRestConnector.delete(objectClassProject, casterlyRockUid, options);
-//			gitlabRestConnector.delete(objectClassProject, highgardenUid, options);
-//			gitlabRestConnector.dispose();
-//		}
-		
-		AttributeFilter containsFilterProject2;
-		containsFilterProject2 = (ContainsFilter) FilterBuilder.contains(AttributeBuilder.build("path", "ľščťžýáíéôúňä"));
-		
-		resultsProject.clear();
-		
-		gitlabRestConnector.executeQuery(objectClassProject, containsFilterProject2, handlerProject, options);
-		
-		listUid.clear();
-		for(ConnectorObject obj : resultsProject){
-			listUid.add((Uid)obj.getAttributeByName(Uid.NAME));
+                for(ConnectorObject obj : resultsAccount){
+                        System.out.println((Uid)obj.getAttributeByName(Uid.NAME));			
 		}
-		
-//		try {
-//			if(!listUid.contains(highgardenUid)){
-//				throw new InvalidAttributeValueException("ContainsFilter not return groupwith special characters(ľščťžýáíéôúňä).");
-//			}
-//		} finally {
-//			gitlabRestConnector.delete(objectClassProject, casterlyRockUid, options);
-//			gitlabRestConnector.delete(objectClassProject, highgardenUid, options);
-//			gitlabRestConnector.dispose();
-//		}
-	}
+	}                	
 }
