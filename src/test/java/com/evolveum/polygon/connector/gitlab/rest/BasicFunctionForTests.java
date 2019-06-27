@@ -41,7 +41,9 @@ public class BasicFunctionForTests {
 	protected GitlabRestConfiguration getConfiguration(){
 		GitlabRestConfiguration conf = new GitlabRestConfiguration();
 		conf.setLoginURL(parser.getLoginUrl());
+                conf.setProtocol(parser.getProtocol());                
 		conf.setPrivateToken(parser.getPrivateToken());
+                conf.setPrivateToken(parser.getPrivateToken());
 		return conf;
 	}
 	

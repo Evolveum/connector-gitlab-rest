@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
@@ -504,14 +505,14 @@ public class ObjectProcessing {
 		LOGGER.info("executeGetRequest path {0}, parameters: {1}, options: {2}, result is array: {3}", path, parameters, options, resultIsArray);
 		URIBuilder uribuilder = getURIBuilder();
 		uribuilder.clearParameters();
-		
+                 int totalPages;		
 		uribuilder.setPath(path);
 		if (options != null) {
 			Integer page = options.getPagedResultsOffset();
 			Integer perPage = options.getPageSize();
 			if (page != null) {
 				uribuilder.addParameter(PAGE, page.toString());
-			}
+			}                        
 			if (perPage != null) {
 				uribuilder.addParameter(PER_PAGE, perPage.toString());
 			}
@@ -524,22 +525,39 @@ public class ObjectProcessing {
 			}
 		}
 
-		try {
-			URI uri = uribuilder.build();
-			HttpRequestBase request = new HttpGet(uri);
+        try {
+            URI uri = uribuilder.build();
+            HttpRequestBase request = new HttpGet(uri);
+            //Get X-Total-Pages
+            totalPages = getTotalPages(request);
 
-			if (resultIsArray) {
-				return callRequestForJSONArray(request, true);
-			} else {
-				return callRequest(request, true);
-			}
-		} catch (URISyntaxException e) {
-			StringBuilder sb = new StringBuilder();
-			sb.append("It was not possible create URI from UriBuider:").append(uriBuilder).append(";")
-					.append(e.getLocalizedMessage());
-			throw new ConnectorException(sb.toString(), e);
-		}
-	}
+            if (resultIsArray) {
+                if (totalPages == 1) {
+                    return callRequestForJSONArray(request, true);
+                } else {
+                    JSONArray responce = new JSONArray();
+                    if (options == null || options.getPageSize() == null) {
+                        uribuilder.addParameter(PER_PAGE, "100");
+                    }
+                    for (int i = 0; i < totalPages; i++) {
+                        URI uriPaged = uribuilder.setParameter(PAGE, Integer.toString(i)).build();
+                        HttpRequestBase requestPaged = new HttpGet(uriPaged);
+                        JSONArray responcePaged = callRequestForJSONArray(requestPaged, true);
+                        responce = mergeJSONArrays(responce, responcePaged);
+                    }
+                    return responce;
+
+                }
+            } else {
+                return callRequest(request, true);
+            }
+        } catch (URISyntaxException e) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("It was not possible create URI from UriBuider:").append(uriBuilder).append(";")
+                    .append(e.getLocalizedMessage());
+            throw new ConnectorException(sb.toString(), e);
+        }
+    }
 
 	protected int getUIDIfExists(JSONObject object, String nameAttr, ConnectorObjectBuilder builder) {
 		if (object.has(nameAttr)) {
@@ -838,5 +856,46 @@ public class ObjectProcessing {
 			LOGGER.warn(e, sb.toString());
 		}
 	}
+
+    private int getTotalPages(HttpRequestBase request) {
+        LOGGER.info("request X-Total-Pages: {0}", request.getURI());
+        int totalPages;
+
+        final StringBuilder privateToken = new StringBuilder();
+        if (this.configuration.getPrivateToken() != null) {
+            Accessor accessor = new GuardedString.Accessor() {
+                @Override
+                public void access(char[] chars) {
+                    privateToken.append(new String(chars));
+                }
+            };
+            this.configuration.getPrivateToken().access(accessor);
+        }
+        request.addHeader("PRIVATE-TOKEN", privateToken.toString());
+        request.addHeader("Content-Type", "application/json; charset=utf-8");
+
+        // execute request
+        CloseableHttpResponse response = execute(request);
+        Header responseHeaderTotalPage = response.getFirstHeader("X-Total-Pages");        
+        if (responseHeaderTotalPage != null) {
+            totalPages = Integer.parseInt(responseHeaderTotalPage.getValue());
+        } else {
+            totalPages = 1;
+        }
+        LOGGER.info("X-Total-Pages: {0}", totalPages);
+        responseClose(response);
+        return totalPages;
+    }
+
+    private JSONArray mergeJSONArrays(JSONArray rootArr, JSONArray addArr) {
+
+        JSONArray sourceArray = new JSONArray(rootArr.toString());
+        JSONArray destinationArray = new JSONArray(addArr.toString());
+
+        for (int i = 0; i < sourceArray.length(); i++) {
+            destinationArray.put(sourceArray.getJSONObject(i));
+        }
+        return destinationArray;
+    }
 
 }

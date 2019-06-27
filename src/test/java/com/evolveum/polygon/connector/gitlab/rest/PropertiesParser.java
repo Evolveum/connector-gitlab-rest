@@ -33,9 +33,10 @@ public class PropertiesParser {
 
 	private static final Log LOGGER = Log.getLog(PropertiesParser.class);
 	private Properties properties;
-	private String FilePath = "../connector-rest-gitlab/testProperties/propertiesForTests.properties";
+	private String FilePath = "../connector-gitlab-rest/testProperties/propertiesForTests.properties";
 	private final String PRIVATE_TOKEN = "privateToken";
 	private final String LOGIN_URL = "loginUrl";
+        private final String PROTOCOL="protocol";
 
 	public PropertiesParser() {
 
@@ -59,5 +60,8 @@ public class PropertiesParser {
 	
 	public String getLoginUrl(){
 		return (String)properties.get(LOGIN_URL);
+	}
+        public String getProtocol() {
+		return (String)properties.get(PROTOCOL);
 	}
 }
