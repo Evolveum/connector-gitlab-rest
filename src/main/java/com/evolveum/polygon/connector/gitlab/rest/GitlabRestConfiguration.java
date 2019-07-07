@@ -33,9 +33,10 @@ public class GitlabRestConfiguration extends AbstractConfiguration implements St
 
 	private String loginUrl;
         private String protocol;
-	private GuardedString privateToken;        
+	private GuardedString privateToken;
+        private String groupsToManage;
 	private static final Log LOGGER = Log.getLog(GitlabRestConnector.class);
-
+        
 
 
 	@ConfigurationProperty(order = 1, displayMessageKey = "privateToken.display", helpMessageKey = "privateToken.help", required = true, confidential = true)
@@ -67,9 +68,19 @@ public class GitlabRestConfiguration extends AbstractConfiguration implements St
 		return protocol;
 	}
         
+        // Add groupsToManage configuration property to limit number of groups and memberships in these groupd that will be managed by connector. If null or empty then all groups. Symbol Coma "," is delimiter       
+        @ConfigurationProperty(order = 5, displayMessageKey = "groupsToManage.display", helpMessageKey = "groupsToManage.help", required = false, confidential = false)
+        public String getGroupsToManage() {
+            return groupsToManage;
+        }
+
+        public String setGroupsToManage(String groupsToManage) {
+            return this.groupsToManage = groupsToManage;
+        }
+
         public void setProtocol(String protocol) {
-		this.protocol = protocol;
-	}
+            this.protocol = protocol;
+        }
 
 	@Override
 	public void validate() {

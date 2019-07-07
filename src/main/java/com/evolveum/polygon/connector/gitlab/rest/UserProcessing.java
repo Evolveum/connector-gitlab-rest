@@ -761,7 +761,7 @@ public class UserProcessing extends ObjectProcessing {
 	}
     public void getAllGroupMembers(GitlabRestConfiguration configuration, CloseableHttpClient httpclient) {
         LOGGER.info("getAllGroupMembers Start");
-        
+        Map<String,String> groupsToManage = getGroupsForFilter(this.configuration.getGroupsToManage());        
         JSONArray groups = new JSONArray();
         JSONArray partOfGroups = new JSONArray();
         int ii = 1;
@@ -769,12 +769,15 @@ public class UserProcessing extends ObjectProcessing {
             Map<String, String> parameters = new HashMap<String, String>();
             parameters.put(PAGE, String.valueOf(ii));
             parameters.put(PER_PAGE, "100");
-
             partOfGroups = (JSONArray) executeGetRequest(GROUPS, parameters, null, true);
             Iterator<Object> iterator = partOfGroups.iterator();
             while (iterator.hasNext()) {
                 Object group = iterator.next();
+                if(groupsToManage == null){
                 groups.put(group);
+                } else if( groupsToManage.containsKey(group.toString().toLowerCase())){
+                groups.put(group);
+                }
             }
             ii++;
         } while (partOfGroups.length() == 100);
@@ -842,5 +845,17 @@ public class UserProcessing extends ObjectProcessing {
             }
         }
         return newOutput;
+    }
+
+    private Map<String, String> getGroupsForFilter(String groupsToManage) {
+        Map<String,String> groupArr = new HashMap<String,String>();
+        if(groupsToManage==null || groupsToManage.isEmpty()){
+        return null;
+        }
+        String[] values = groupsToManage.toLowerCase().split(",");
+        for (String value : values) {
+            groupArr.put(value, value);
+        }
+        return   groupArr; 
     }
 }
