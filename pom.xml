@@ -19,7 +19,7 @@
 	</parent>
 
 	<artifactId>connector-gitlab-rest</artifactId>
-	<version>1.1c</version> 
+	<version>1.1d</version> 
 	<packaging>jar</packaging>
 
 	<name>REST Connector Gitlab</name>
