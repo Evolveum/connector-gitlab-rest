@@ -136,7 +136,7 @@ public class UserPerformanceTests extends BasicFunctionForTests {
 	public void Search100UsersTest(){
 		GitlabRestConnector gitlabRestConnector = new GitlabRestConnector();
 		
-		GitlabRestConfiguration conf = getConfiguration();
+		GitlabRestConfiguration conf = getConfiguration();                
 		
 		ObjectClass objectClassAccount = ObjectClass.ACCOUNT;
 		

@@ -74,8 +74,8 @@ public class GitlabRestConfiguration extends AbstractConfiguration implements St
             return groupsToManage;
         }
 
-        public String setGroupsToManage(String groupsToManage) {
-            return this.groupsToManage = groupsToManage;
+        public void setGroupsToManage(String groupsToManage) {
+            this.groupsToManage = groupsToManage;
         }
 
         public void setProtocol(String protocol) {
@@ -104,6 +104,7 @@ public class GitlabRestConfiguration extends AbstractConfiguration implements St
 		this.loginUrl = null;                
 		this.privateToken.dispose();
                 this.protocol = null;
+                this.groupsToManage=null;
 	}
 
 	@Override

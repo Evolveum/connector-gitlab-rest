@@ -775,7 +775,7 @@ public class UserProcessing extends ObjectProcessing {
                 Object group = iterator.next();
                 if(groupsToManage == null){
                 groups.put(group);
-                } else if( groupsToManage.containsKey(group.toString().toLowerCase())){
+                } else if( groupsToManage.containsKey(new JSONObject(group.toString()).getString("name").toLowerCase())){
                 groups.put(group);
                 }
             }
