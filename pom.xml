@@ -19,7 +19,7 @@
 	</parent>
 
 	<artifactId>connector-gitlab-rest</artifactId>
-	<version>1.0</version> 
+	<version>1.1d</version> 
 	<packaging>jar</packaging>
 
 	<name>REST Connector Gitlab</name>
@@ -75,11 +75,17 @@
 			<groupId>com.evolveum.polygon</groupId>
 			<version>1.4.2.18</version>
 		</dependency>
-		<dependency>
+<!--		<dependency>
 			<groupId>net.tirasa.connid</groupId>
 			<artifactId>connector-framework</artifactId>
 			<version>1.4.3.0-SNAPSHOT</version>
 		</dependency>
+-->
+<dependency>
+    <groupId>net.tirasa.connid</groupId>
+    <artifactId>connector-framework</artifactId>
+    <version>1.4.3.0</version>
+</dependency>
 
 		<dependency>
 			<groupId>org.json</groupId>

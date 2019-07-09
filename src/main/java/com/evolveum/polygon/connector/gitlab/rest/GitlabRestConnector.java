@@ -21,8 +21,10 @@ package com.evolveum.polygon.connector.gitlab.rest;
  */
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -200,7 +202,7 @@ public class GitlabRestConnector implements TestOp, SchemaOp, Connector, CreateO
 			LOGGER.error("Attribute of type OperationOptions not provided.");
 			throw new InvalidAttributeValueException("Attribute of type OperationOptions is not provided.");
 		}
-
+               
 		LOGGER.info("executeQuery on {0}, filter: {1}, options: {2}", objectClass, query, options);
 
 		if (objectClass.is(ObjectClass.ACCOUNT_NAME)) {

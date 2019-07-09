@@ -15,6 +15,8 @@
  */
 package com.evolveum.polygon.connector.gitlab.rest;
 
+import static com.evolveum.polygon.connector.gitlab.rest.GroupOrProjectProcessing.ATTR_GUEST_MEMBERS;
+import static com.evolveum.polygon.connector.gitlab.rest.ObjectProcessing.GROUPS;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
@@ -24,6 +26,7 @@ import java.time.format.DateTimeFormatter;
  *
  */
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -53,6 +56,7 @@ import org.identityconnectors.framework.common.objects.OperationalAttributes;
 import org.identityconnectors.framework.common.objects.ResultsHandler;
 import org.identityconnectors.framework.common.objects.SchemaBuilder;
 import org.identityconnectors.framework.common.objects.Uid;
+import org.identityconnectors.framework.common.objects.filter.ContainsAllValuesFilter;
 import org.identityconnectors.framework.common.objects.filter.ContainsFilter;
 import org.identityconnectors.framework.common.objects.filter.EqualsFilter;
 import org.identityconnectors.framework.common.objects.filter.Filter;
@@ -78,7 +82,10 @@ public class UserProcessing extends ObjectProcessing {
 	private static final String ATTR_ADMIN = "admin";
 	private static final String ATTR_IS_ADMIN = "is_admin";
 	private static final String ATTR_CAN_CREATE_GROUP = "can_create_group";
-	private static final String ATTR_CONFIRM = "confirm";
+        // Fix wrong attribute name for REST API. Old value "confirm" a new one "skip_confirmation"	        
+        private static final String ATTR_CONFIRM = "skip_confirmation";
+        // Add new attribute "skip_reconfirmation" to fix "Update user email address via API fails to change value" https://gitlab.com/gitlab-org/gitlab-ce/issues/17797
+        private static final String ATTR_RECONFIRM = "skip_reconfirmation";
 	private static final String ATTR_EXTERNAL = "external";
 	private static final String ATTR_STATE = "state";
 	private static final String ATTR_LAST_SING_IN_AT = "last_sign_in_at";
@@ -92,9 +99,20 @@ public class UserProcessing extends ObjectProcessing {
 	private static final String ATTR_CAN_CREATE_PROJ = "can_create_project";
 	private static final String ATTR_TWO_FACTOR_ENABLED = "two_factor_enabled";
 	private static final String ATTR_SSH_KEYS = "SSH_keys";
+        protected static final String ATTR_GROUP_OWNER = "group-owner";
+        protected static final String ATTR_GROUP_MASTER = "group-master";
+        protected static final String ATTR_GROUP_DEVELOPER = "group-developer";
+        protected static final String ATTR_GROUP_REPORTER = "group-reporter";
+            protected static final String ATTR_GROUP_GEST = "group-gest";
+        protected CloseableHttpClient httpclient;
+	private GitlabRestConfiguration configuration;
+        private Map<String, Map<Integer, List<String>>> mapUsersGroups;
+        
 
 	public UserProcessing(GitlabRestConfiguration configuration, CloseableHttpClient httpclient) {
 		super(configuration, httpclient);
+                this.configuration = configuration;
+		this.httpclient = httpclient;
 	}
 
 	public void buildUserObjectClass(SchemaBuilder schemaBuilder) {
@@ -160,8 +178,13 @@ public class UserProcessing extends ObjectProcessing {
 		
 		//createable: TRUE && updateable: FALSE && readable: FALSE
 		AttributeInfoBuilder attrConfirmBuilder = new AttributeInfoBuilder(ATTR_CONFIRM);
-		attrConfirmBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(false).setReadable(false).setReturnedByDefault(false);
+		attrConfirmBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(true).setReadable(false).setReturnedByDefault(false);
 		userObjClassBuilder.addAttributeInfo(attrConfirmBuilder.build());
+                
+                //createable: TRUE && updateable: FALSE && readable: FALSE
+		AttributeInfoBuilder attrReconfirmBuilder = new AttributeInfoBuilder(ATTR_RECONFIRM);
+		attrReconfirmBuilder.setType(Boolean.class).setCreateable(false).setUpdateable(true).setReadable(false).setReturnedByDefault(false);
+		userObjClassBuilder.addAttributeInfo(attrReconfirmBuilder.build());
 		
 		//createable: FALSE && updateable: FALSE && readable: TRUE
 		AttributeInfoBuilder attrAvatarUrlBuilder = new AttributeInfoBuilder(ATTR_AVATAR_URL);
@@ -217,6 +240,31 @@ public class UserProcessing extends ObjectProcessing {
 		AttributeInfoBuilder sshKeysBuilder = new AttributeInfoBuilder(ATTR_SSH_KEYS);
 		sshKeysBuilder.setType(String.class).setMultiValued(true).setCreateable(true).setUpdateable(true).setReadable(true);
 		userObjClassBuilder.addAttributeInfo(sshKeysBuilder.build());
+                
+                //multivalued: TRUE && createable: TRUE && updateable: TRUE && readable: TRUE
+		AttributeInfoBuilder attrGroupOwnerBuilder = new AttributeInfoBuilder(ATTR_GROUP_OWNER);
+		attrGroupOwnerBuilder.setType(String.class).setMultiValued(true).setReadable(true);
+		userObjClassBuilder.addAttributeInfo(attrGroupOwnerBuilder.build());
+                
+                //multivalued: TRUE && createable: TRUE && updateable: TRUE && readable: TRUE
+		AttributeInfoBuilder attrGroupMasterBuilder = new AttributeInfoBuilder(ATTR_GROUP_MASTER);
+		attrGroupMasterBuilder.setType(String.class).setMultiValued(true).setReadable(true);
+		userObjClassBuilder.addAttributeInfo(attrGroupMasterBuilder.build());
+                
+                //multivalued: TRUE && createable: TRUE && updateable: TRUE && readable: TRUE
+		AttributeInfoBuilder attrGroupDeveloperBuilder = new AttributeInfoBuilder(ATTR_GROUP_DEVELOPER);
+		attrGroupDeveloperBuilder.setType(String.class).setMultiValued(true).setReadable(true);
+		userObjClassBuilder.addAttributeInfo(attrGroupDeveloperBuilder.build());
+                
+                //multivalued: TRUE && createable: TRUE && updateable: TRUE && readable: TRUE
+		AttributeInfoBuilder attrGroupReporterBuilder = new AttributeInfoBuilder(ATTR_GROUP_REPORTER);
+		attrGroupReporterBuilder.setType(String.class).setMultiValued(true).setReadable(true);
+		userObjClassBuilder.addAttributeInfo(attrGroupReporterBuilder.build());
+                
+                //multivalued: TRUE && createable: TRUE && updateable: TRUE && readable: TRUE
+		AttributeInfoBuilder attrGroupGestBuilder = new AttributeInfoBuilder(ATTR_GROUP_GEST);
+		attrGroupGestBuilder.setType(String.class).setMultiValued(true).setReadable(true);
+		userObjClassBuilder.addAttributeInfo(attrGroupGestBuilder.build());
 		
 		schemaBuilder.defineObjectClass(userObjClassBuilder.build());
 	}
@@ -245,9 +293,13 @@ public class UserProcessing extends ObjectProcessing {
 		putAttrIfExists(attributes, ATTR_LOCATION, String.class, json);
 		putAttrIfExists(attributes, ATTR_IS_ADMIN, Boolean.class, json, ATTR_ADMIN);
 		putAttrIfExists(attributes, ATTR_CAN_CREATE_GROUP, Boolean.class, json);
-		putAttrIfExists(attributes, ATTR_CONFIRM, Boolean.class, json);
-		putAttrIfExists(attributes, ATTR_EXTERNAL, Boolean.class, json);
-
+                putAttrIfExists(attributes, ATTR_EXTERNAL, Boolean.class, json);
+                putAttrIfExists(attributes, ATTR_CONFIRM, Boolean.class, json);
+		
+                if(!create){
+                putAttrIfExists(attributes, ATTR_RECONFIRM, Boolean.class, json);
+                }
+		
 //		for (Attribute attr : attributes) {
 //			if (ATTR_AVATAR.equals(attr.getName())) {
 //				List<Object> vals = attr.getValue();
@@ -269,6 +321,7 @@ public class UserProcessing extends ObjectProcessing {
 		changeStateIfExists(attributes, newUid);
 		
 		if(create){
+
 			
 			for (Attribute attr : attributes) {
 				if (ATTR_SSH_KEYS.equals(attr.getName())) {
@@ -451,6 +504,31 @@ public class UserProcessing extends ObjectProcessing {
 		if(identities != null){
 			builder.addAttribute(ATTR_IDENTITIES, identities.toArray());
 		}
+                
+                // Get all members
+            if (mapUsersGroups == null || mapUsersGroups.isEmpty()) {
+                getAllGroupMembers(configuration, httpclient);
+            }
+
+            // Get user groups
+            Map<Integer, List<String>> groups = mapUsersGroups.get(String.valueOf(getUIDIfExists(user, UID, builder)));
+            if (groups != null && !groups.isEmpty()) {
+                if (groups.get(10) != null && !groups.get(10).isEmpty()) {
+                    builder.addAttribute(ATTR_GROUP_GEST, groups.get(10).toArray());
+                }
+                if (groups.get(20) != null && !groups.get(20).isEmpty()) {
+                    builder.addAttribute(ATTR_GROUP_REPORTER, groups.get(20).toArray());
+                }
+                if (groups.get(30) != null && !groups.get(30).isEmpty()) {
+                    builder.addAttribute(ATTR_GROUP_DEVELOPER, groups.get(30).toArray());
+                }
+                if (groups.get(40) != null && !groups.get(40).isEmpty()) {
+                    builder.addAttribute(ATTR_GROUP_MASTER, groups.get(40).toArray());
+                }
+                if (groups.get(50) != null && !groups.get(50).isEmpty()) {
+                    builder.addAttribute(ATTR_GROUP_OWNER, groups.get(50).toArray());
+                }
+            }
 
 		return builder;
 	}
@@ -575,9 +653,9 @@ public class UserProcessing extends ObjectProcessing {
 				LOGGER.error(sb.toString());
 				throw new InvalidAttributeValueException(sb.toString());
 			}
-		} else if (query == null) {
-			JSONArray users = (JSONArray) executeGetRequest(USERS, null, options, true);
-			processingObjectFromGET(users, handler);
+		} else if (query == null) {                        
+			JSONArray users = (JSONArray) executeGetRequest(USERS, null, options, true);			
+                        processingObjectFromGET(users, handler);
 		} else {
 			StringBuilder sb = new StringBuilder();
 			sb.append("Unexpected filter ").append(query.getClass());
@@ -681,4 +759,103 @@ public class UserProcessing extends ObjectProcessing {
 		}
 		return null;
 	}
+    public void getAllGroupMembers(GitlabRestConfiguration configuration, CloseableHttpClient httpclient) {
+        LOGGER.info("getAllGroupMembers Start");
+        Map<String,String> groupsToManage = getGroupsForFilter(this.configuration.getGroupsToManage());        
+        JSONArray groups = new JSONArray();
+        JSONArray partOfGroups = new JSONArray();
+        int ii = 1;
+        do {
+            Map<String, String> parameters = new HashMap<String, String>();
+            parameters.put(PAGE, String.valueOf(ii));
+            parameters.put(PER_PAGE, "100");
+            partOfGroups = (JSONArray) executeGetRequest(GROUPS, parameters, null, true);
+            Iterator<Object> iterator = partOfGroups.iterator();
+            while (iterator.hasNext()) {
+                Object group = iterator.next();
+                if(groupsToManage == null){
+                groups.put(group);
+                } else if( groupsToManage.containsKey(new JSONObject(group.toString()).getString("name").toLowerCase())){
+                groups.put(group);
+                }
+            }
+            ii++;
+        } while (partOfGroups.length() == 100);
+        
+
+        Map<String, Map<Integer, List<String>>> mapGroupsMembers = new HashMap();
+        JSONObject group;
+        for (int i = 0; i < groups.length(); i++) {
+            group = groups.getJSONObject(i);            
+
+            StringBuilder sbPath = new StringBuilder();
+            sbPath.append(GROUPS).append("/").append(String.valueOf(group.get(UID)));
+            GroupOrProjectProcessing groupOrProjectProcessing = new GroupOrProjectProcessing(configuration, httpclient);
+            URIBuilder uribuilderMember = groupOrProjectProcessing.createRequestForMembers(sbPath.toString());
+            Map<Integer, List<String>> mapMembersGroup = groupOrProjectProcessing.getMembers(uribuilderMember);
+            mapGroupsMembers.put(String.valueOf(group.get(UID)), mapMembersGroup);
+        }
+        this.mapUsersGroups = getUsersGroups(mapGroupsMembers);
+        LOGGER.info("getAllGroupMembers End ");
+    }
+
+    private Map<String, Map<Integer, List<String>>> getUsersGroups(Map<String, Map<Integer, List<String>>> mapMembersGroup) {
+        Map<String, Map<Integer, List<String>>> output = new HashMap();
+
+        Iterator<String> grIter = mapMembersGroup.keySet().iterator();
+        while (grIter.hasNext()) {
+            String groupId = grIter.next();
+            Map<Integer, List<String>> groupMembers = mapMembersGroup.get(groupId);
+
+            output = getAccessGroupsUser(output, groupId, 10, groupMembers);
+            output = getAccessGroupsUser(output, groupId, 20, groupMembers);
+            output = getAccessGroupsUser(output, groupId, 30, groupMembers);
+            output = getAccessGroupsUser(output, groupId, 40, groupMembers);
+            output = getAccessGroupsUser(output, groupId, 50, groupMembers);
+
+        }
+        return output;
+    }
+
+    private Map<String, Map<Integer, List<String>>> getAccessGroupsUser(Map<String, Map<Integer, List<String>>> output, String groupId, Integer accLvl, Map<Integer, List<String>> groupMembers) {
+        Map<String, Map<Integer, List<String>>> newOutput = new HashMap(output);
+        List<String> accLvlGroup = groupMembers.get(accLvl);
+        Iterator<String> itGest = accLvlGroup.iterator();
+        while (itGest.hasNext()) {
+            String user = itGest.next();
+            if (newOutput.containsKey(user)) {
+                Map<Integer, List<String>> currentAccessGroups = newOutput.get(user);
+
+                List<String> currentGroups = currentAccessGroups.get(accLvl);
+                if (currentGroups == null || currentGroups.isEmpty()) {
+                    List<String> newGroups = Arrays.asList(groupId);
+                    currentAccessGroups.put(accLvl, newGroups);
+                } else {
+                    List<String> newGroups = new ArrayList<String>(currentGroups);
+                    newGroups.add(groupId);
+                    currentAccessGroups.replace(accLvl, newGroups);
+                }
+                newOutput.replace(user, currentAccessGroups);
+
+            } else {
+                List<String> group = Arrays.asList(groupId);
+                Map<Integer, List<String>> accessGroup = new HashMap();
+                accessGroup.put(accLvl, group);
+                newOutput.put(user, accessGroup);
+            }
+        }
+        return newOutput;
+    }
+
+    private Map<String, String> getGroupsForFilter(String groupsToManage) {
+        Map<String,String> groupArr = new HashMap<String,String>();
+        if(groupsToManage==null || groupsToManage.isEmpty()){
+        return null;
+        }
+        String[] values = groupsToManage.toLowerCase().split(",");
+        for (String value : values) {
+            groupArr.put(value, value);
+        }
+        return   groupArr; 
+    }
 }
