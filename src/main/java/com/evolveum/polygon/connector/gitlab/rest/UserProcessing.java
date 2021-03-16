@@ -38,6 +38,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.identityconnectors.common.security.GuardedString;
 import org.identityconnectors.framework.common.exceptions.ConnectorException;
 import org.identityconnectors.framework.common.exceptions.ConnectorIOException;
 import org.identityconnectors.framework.common.exceptions.InvalidAttributeValueException;
@@ -50,6 +51,7 @@ import org.identityconnectors.framework.common.objects.Name;
 import org.identityconnectors.framework.common.objects.ObjectClass;
 import org.identityconnectors.framework.common.objects.ObjectClassInfoBuilder;
 import org.identityconnectors.framework.common.objects.OperationOptions;
+import org.identityconnectors.framework.common.objects.OperationalAttributeInfos;
 import org.identityconnectors.framework.common.objects.OperationalAttributes;
 import org.identityconnectors.framework.common.objects.ResultsHandler;
 import org.identityconnectors.framework.common.objects.SchemaBuilder;
@@ -66,6 +68,11 @@ public class UserProcessing extends ObjectProcessing {
 
 	// mandatory attributes
 	private static final String ATTR_MAIL = "email";
+
+	// Either password, reset_password, or force_random_password must be specified. If reset_password and force_random_password are both false, then password is required.
+	private static final String ATTR_PASSWORD = "password";
+	private static final String ATTR_RESET_PASSWORD = "reset_password";
+	private static final String ATTR_FORCE_RANDOM_PASSWORD = "force_random_password";
 
 	// optional attributes
 	private static final String ATTR_SKYPE = "skype";
@@ -262,7 +269,18 @@ public class UserProcessing extends ObjectProcessing {
 		AttributeInfoBuilder attrGroupGuestBuilder = new AttributeInfoBuilder(ATTR_GROUP_GUEST);
 		attrGroupGuestBuilder.setType(String.class).setMultiValued(true).setReadable(true);
 		userObjClassBuilder.addAttributeInfo(attrGroupGuestBuilder.build());
-		
+
+		// password related attributes
+		userObjClassBuilder.addAttributeInfo(OperationalAttributeInfos.PASSWORD);
+
+		AttributeInfoBuilder attrResetPasswordBuilder = new AttributeInfoBuilder(ATTR_RESET_PASSWORD);
+		attrResetPasswordBuilder.setType(Boolean.class).setUpdateable(false).setReadable(false).setReturnedByDefault(false);
+		userObjClassBuilder.addAttributeInfo(attrResetPasswordBuilder.build());
+
+		AttributeInfoBuilder attrForceRandomPasswordBuilder = new AttributeInfoBuilder(ATTR_FORCE_RANDOM_PASSWORD);
+		attrForceRandomPasswordBuilder.setType(Boolean.class).setUpdateable(false).setReadable(false).setReturnedByDefault(false);
+		userObjClassBuilder.addAttributeInfo(attrForceRandomPasswordBuilder.build());
+
 		schemaBuilder.defineObjectClass(userObjClassBuilder.build());
 	}
 
@@ -855,4 +873,42 @@ public class UserProcessing extends ObjectProcessing {
         }
         return   groupArr; 
     }
+
+	private void putRequestedPassword(Boolean create, Set<Attribute> attributes, JSONObject json) {
+
+		LOGGER.info("putRequestedPassword attributes: {0}, json: {1}", attributes.toString(), json.toString());
+
+		final StringBuilder sbPass = new StringBuilder();
+
+		GuardedString pass = getAttr(attributes, OperationalAttributes.PASSWORD_NAME, GuardedString.class, null);
+
+		if (pass != null) {
+			pass.access(new GuardedString.Accessor() {
+				@Override
+				public void access(char[] chars) {
+					sbPass.append(new String(chars));
+				}
+			});
+
+			json.put(ATTR_PASSWORD, sbPass.toString());
+
+		} else if (create) {
+			boolean resetPassword = getAttr(attributes, ATTR_RESET_PASSWORD, Boolean.class, false);
+			if (resetPassword) {
+				json.put(ATTR_RESET_PASSWORD, true);
+			}
+			boolean forceRandomPassword = getAttr(attributes, ATTR_FORCE_RANDOM_PASSWORD, Boolean.class, false);
+			if (forceRandomPassword) {
+				json.put(ATTR_FORCE_RANDOM_PASSWORD, true);
+			}
+
+			if (!resetPassword && !forceRandomPassword) {
+				StringBuilder sb = new StringBuilder();
+				sb.append("Missing value of required attribute:").append(OperationalAttributes.PASSWORD_NAME)
+						.append("; for creating user");
+				LOGGER.error(sb.toString());
+				throw new InvalidAttributeValueException(sb.toString());
+			}
+		}
+	}
 }

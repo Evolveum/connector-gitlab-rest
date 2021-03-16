@@ -60,7 +60,6 @@ import org.identityconnectors.framework.common.exceptions.UnknownUidException;
 import org.identityconnectors.framework.common.objects.Attribute;
 import org.identityconnectors.framework.common.objects.ConnectorObjectBuilder;
 import org.identityconnectors.framework.common.objects.OperationOptions;
-import org.identityconnectors.framework.common.objects.OperationalAttributes;
 import org.identityconnectors.framework.common.objects.Uid;
 import org.identityconnectors.framework.common.objects.filter.Filter;
 import org.identityconnectors.framework.spi.Configuration;
@@ -99,7 +98,6 @@ public class ObjectProcessing {
 	protected static final String ATTR_AVATAR_URL = "avatar_url";
 	protected static final String ATTR_AVATAR = "avatar";
 	protected static final String ATTR_CREATED_AT = "created_at";
-	private static final String ATTR_PASS = "password";
 
 	protected static final String UID = "id"; // ID
 	protected static final String ATTR_USERNAME = "username";
@@ -447,33 +445,6 @@ public class ObjectProcessing {
 		}
 		if (valueAttr != null) {
 			json.put(attrNameToGitlab, valueAttr);
-		}
-	}
-
-	protected void putRequestedPassword(Boolean create, Set<Attribute> attributes, JSONObject json) {
-
-		LOGGER.info("putRequestedPassword attributes: {0}, json: {1}", attributes.toString(), json.toString());
-
-		final StringBuilder sbPass = new StringBuilder();
-
-		GuardedString pass = getAttr(attributes, OperationalAttributes.PASSWORD_NAME, GuardedString.class, null);
-
-		if (pass != null) {
-			pass.access(new GuardedString.Accessor() {
-				@Override
-				public void access(char[] chars) {
-					sbPass.append(new String(chars));
-				}
-			});
-
-			json.put(ATTR_PASS, sbPass.toString());
-
-		} else if (create) {
-			StringBuilder sb = new StringBuilder();
-			sb.append("Missing value of required attribute:").append(OperationalAttributes.PASSWORD_NAME)
-					.append("; for creating user");
-			LOGGER.error(sb.toString());
-			throw new InvalidAttributeValueException(sb.toString());
 		}
 	}
 
