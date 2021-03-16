@@ -15,8 +15,6 @@
  */
 package com.evolveum.polygon.connector.gitlab.rest;
 
-import static com.evolveum.polygon.connector.gitlab.rest.GroupOrProjectProcessing.ATTR_GUEST_MEMBERS;
-import static com.evolveum.polygon.connector.gitlab.rest.ObjectProcessing.GROUPS;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
@@ -56,7 +54,6 @@ import org.identityconnectors.framework.common.objects.OperationalAttributes;
 import org.identityconnectors.framework.common.objects.ResultsHandler;
 import org.identityconnectors.framework.common.objects.SchemaBuilder;
 import org.identityconnectors.framework.common.objects.Uid;
-import org.identityconnectors.framework.common.objects.filter.ContainsAllValuesFilter;
 import org.identityconnectors.framework.common.objects.filter.ContainsFilter;
 import org.identityconnectors.framework.common.objects.filter.EqualsFilter;
 import org.identityconnectors.framework.common.objects.filter.Filter;
@@ -103,7 +100,7 @@ public class UserProcessing extends ObjectProcessing {
         protected static final String ATTR_GROUP_MASTER = "group-master";
         protected static final String ATTR_GROUP_DEVELOPER = "group-developer";
         protected static final String ATTR_GROUP_REPORTER = "group-reporter";
-            protected static final String ATTR_GROUP_GEST = "group-gest";
+            protected static final String ATTR_GROUP_GUEST = "group-guest";
         protected CloseableHttpClient httpclient;
 	private GitlabRestConfiguration configuration;
         private Map<String, Map<Integer, List<String>>> mapUsersGroups;
@@ -262,9 +259,9 @@ public class UserProcessing extends ObjectProcessing {
 		userObjClassBuilder.addAttributeInfo(attrGroupReporterBuilder.build());
                 
                 //multivalued: TRUE && createable: TRUE && updateable: TRUE && readable: TRUE
-		AttributeInfoBuilder attrGroupGestBuilder = new AttributeInfoBuilder(ATTR_GROUP_GEST);
-		attrGroupGestBuilder.setType(String.class).setMultiValued(true).setReadable(true);
-		userObjClassBuilder.addAttributeInfo(attrGroupGestBuilder.build());
+		AttributeInfoBuilder attrGroupGuestBuilder = new AttributeInfoBuilder(ATTR_GROUP_GUEST);
+		attrGroupGuestBuilder.setType(String.class).setMultiValued(true).setReadable(true);
+		userObjClassBuilder.addAttributeInfo(attrGroupGuestBuilder.build());
 		
 		schemaBuilder.defineObjectClass(userObjClassBuilder.build());
 	}
@@ -514,7 +511,7 @@ public class UserProcessing extends ObjectProcessing {
             Map<Integer, List<String>> groups = mapUsersGroups.get(String.valueOf(getUIDIfExists(user, UID, builder)));
             if (groups != null && !groups.isEmpty()) {
                 if (groups.get(10) != null && !groups.get(10).isEmpty()) {
-                    builder.addAttribute(ATTR_GROUP_GEST, groups.get(10).toArray());
+                    builder.addAttribute(ATTR_GROUP_GUEST, groups.get(10).toArray());
                 }
                 if (groups.get(20) != null && !groups.get(20).isEmpty()) {
                     builder.addAttribute(ATTR_GROUP_REPORTER, groups.get(20).toArray());
@@ -553,7 +550,7 @@ public class UserProcessing extends ObjectProcessing {
 				requestSSHKey = new HttpGet(uriBuilder.build());
 			} catch (URISyntaxException e) {
 				StringBuilder sb = new StringBuilder();
-				sb.append("It was not possible create URI from UriBuider; ").append(e.getLocalizedMessage());
+				sb.append("It was not possible create URI from UriBuilder; ").append(e.getLocalizedMessage());
 				throw new ConnectorException(sb.toString(), e);
 			}
 			partOfsSSHKeys = callRequestForJSONArray(requestSSHKey, true);
