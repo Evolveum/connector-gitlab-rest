@@ -182,10 +182,10 @@ public class UserProcessing extends ObjectProcessing {
 		
 		//createable: TRUE && updateable: FALSE && readable: FALSE
 		AttributeInfoBuilder attrConfirmBuilder = new AttributeInfoBuilder(ATTR_CONFIRM);
-		attrConfirmBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(true).setReadable(false).setReturnedByDefault(false);
+		attrConfirmBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(false).setReadable(false).setReturnedByDefault(false);
 		userObjClassBuilder.addAttributeInfo(attrConfirmBuilder.build());
                 
-                //createable: TRUE && updateable: FALSE && readable: FALSE
+		//createable: FALSE && updateable: TRUE && readable: FALSE
 		AttributeInfoBuilder attrReconfirmBuilder = new AttributeInfoBuilder(ATTR_RECONFIRM);
 		attrReconfirmBuilder.setType(Boolean.class).setCreateable(false).setUpdateable(true).setReadable(false).setReturnedByDefault(false);
 		userObjClassBuilder.addAttributeInfo(attrReconfirmBuilder.build());
