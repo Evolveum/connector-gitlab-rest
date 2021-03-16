@@ -281,6 +281,9 @@ public class UserProcessing extends ObjectProcessing {
 		attrForceRandomPasswordBuilder.setType(Boolean.class).setUpdateable(false).setReadable(false).setReturnedByDefault(false);
 		userObjClassBuilder.addAttributeInfo(attrForceRandomPasswordBuilder.build());
 
+		// __ENABLE__
+		userObjClassBuilder.addAttributeInfo(OperationalAttributeInfos.ENABLE);
+
 		schemaBuilder.defineObjectClass(userObjClassBuilder.build());
 	}
 
