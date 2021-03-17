@@ -15,8 +15,6 @@
  */
 package com.evolveum.polygon.connector.gitlab.rest;
 
-import static com.evolveum.polygon.connector.gitlab.rest.GroupOrProjectProcessing.ATTR_GUEST_MEMBERS;
-import static com.evolveum.polygon.connector.gitlab.rest.ObjectProcessing.GROUPS;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
@@ -40,6 +38,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.identityconnectors.common.security.GuardedString;
 import org.identityconnectors.framework.common.exceptions.ConnectorException;
 import org.identityconnectors.framework.common.exceptions.ConnectorIOException;
 import org.identityconnectors.framework.common.exceptions.InvalidAttributeValueException;
@@ -52,11 +51,11 @@ import org.identityconnectors.framework.common.objects.Name;
 import org.identityconnectors.framework.common.objects.ObjectClass;
 import org.identityconnectors.framework.common.objects.ObjectClassInfoBuilder;
 import org.identityconnectors.framework.common.objects.OperationOptions;
+import org.identityconnectors.framework.common.objects.OperationalAttributeInfos;
 import org.identityconnectors.framework.common.objects.OperationalAttributes;
 import org.identityconnectors.framework.common.objects.ResultsHandler;
 import org.identityconnectors.framework.common.objects.SchemaBuilder;
 import org.identityconnectors.framework.common.objects.Uid;
-import org.identityconnectors.framework.common.objects.filter.ContainsAllValuesFilter;
 import org.identityconnectors.framework.common.objects.filter.ContainsFilter;
 import org.identityconnectors.framework.common.objects.filter.EqualsFilter;
 import org.identityconnectors.framework.common.objects.filter.Filter;
@@ -69,6 +68,11 @@ public class UserProcessing extends ObjectProcessing {
 
 	// mandatory attributes
 	private static final String ATTR_MAIL = "email";
+
+	// Either password, reset_password, or force_random_password must be specified. If reset_password and force_random_password are both false, then password is required.
+	private static final String ATTR_PASSWORD = "password";
+	private static final String ATTR_RESET_PASSWORD = "reset_password";
+	private static final String ATTR_FORCE_RANDOM_PASSWORD = "force_random_password";
 
 	// optional attributes
 	private static final String ATTR_SKYPE = "skype";
@@ -103,7 +107,7 @@ public class UserProcessing extends ObjectProcessing {
         protected static final String ATTR_GROUP_MASTER = "group-master";
         protected static final String ATTR_GROUP_DEVELOPER = "group-developer";
         protected static final String ATTR_GROUP_REPORTER = "group-reporter";
-            protected static final String ATTR_GROUP_GEST = "group-gest";
+            protected static final String ATTR_GROUP_GUEST = "group-guest";
         protected CloseableHttpClient httpclient;
 	private GitlabRestConfiguration configuration;
         private Map<String, Map<Integer, List<String>>> mapUsersGroups;
@@ -178,10 +182,10 @@ public class UserProcessing extends ObjectProcessing {
 		
 		//createable: TRUE && updateable: FALSE && readable: FALSE
 		AttributeInfoBuilder attrConfirmBuilder = new AttributeInfoBuilder(ATTR_CONFIRM);
-		attrConfirmBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(true).setReadable(false).setReturnedByDefault(false);
+		attrConfirmBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(false).setReadable(false).setReturnedByDefault(false);
 		userObjClassBuilder.addAttributeInfo(attrConfirmBuilder.build());
                 
-                //createable: TRUE && updateable: FALSE && readable: FALSE
+		//createable: FALSE && updateable: TRUE && readable: FALSE
 		AttributeInfoBuilder attrReconfirmBuilder = new AttributeInfoBuilder(ATTR_RECONFIRM);
 		attrReconfirmBuilder.setType(Boolean.class).setCreateable(false).setUpdateable(true).setReadable(false).setReturnedByDefault(false);
 		userObjClassBuilder.addAttributeInfo(attrReconfirmBuilder.build());
@@ -262,10 +266,24 @@ public class UserProcessing extends ObjectProcessing {
 		userObjClassBuilder.addAttributeInfo(attrGroupReporterBuilder.build());
                 
                 //multivalued: TRUE && createable: TRUE && updateable: TRUE && readable: TRUE
-		AttributeInfoBuilder attrGroupGestBuilder = new AttributeInfoBuilder(ATTR_GROUP_GEST);
-		attrGroupGestBuilder.setType(String.class).setMultiValued(true).setReadable(true);
-		userObjClassBuilder.addAttributeInfo(attrGroupGestBuilder.build());
-		
+		AttributeInfoBuilder attrGroupGuestBuilder = new AttributeInfoBuilder(ATTR_GROUP_GUEST);
+		attrGroupGuestBuilder.setType(String.class).setMultiValued(true).setReadable(true);
+		userObjClassBuilder.addAttributeInfo(attrGroupGuestBuilder.build());
+
+		// password related attributes
+		userObjClassBuilder.addAttributeInfo(OperationalAttributeInfos.PASSWORD);
+
+		AttributeInfoBuilder attrResetPasswordBuilder = new AttributeInfoBuilder(ATTR_RESET_PASSWORD);
+		attrResetPasswordBuilder.setType(Boolean.class).setUpdateable(false).setReadable(false).setReturnedByDefault(false);
+		userObjClassBuilder.addAttributeInfo(attrResetPasswordBuilder.build());
+
+		AttributeInfoBuilder attrForceRandomPasswordBuilder = new AttributeInfoBuilder(ATTR_FORCE_RANDOM_PASSWORD);
+		attrForceRandomPasswordBuilder.setType(Boolean.class).setUpdateable(false).setReadable(false).setReturnedByDefault(false);
+		userObjClassBuilder.addAttributeInfo(attrForceRandomPasswordBuilder.build());
+
+		// __ENABLE__
+		userObjClassBuilder.addAttributeInfo(OperationalAttributeInfos.ENABLE);
+
 		schemaBuilder.defineObjectClass(userObjClassBuilder.build());
 	}
 
@@ -514,7 +532,7 @@ public class UserProcessing extends ObjectProcessing {
             Map<Integer, List<String>> groups = mapUsersGroups.get(String.valueOf(getUIDIfExists(user, UID, builder)));
             if (groups != null && !groups.isEmpty()) {
                 if (groups.get(10) != null && !groups.get(10).isEmpty()) {
-                    builder.addAttribute(ATTR_GROUP_GEST, groups.get(10).toArray());
+                    builder.addAttribute(ATTR_GROUP_GUEST, groups.get(10).toArray());
                 }
                 if (groups.get(20) != null && !groups.get(20).isEmpty()) {
                     builder.addAttribute(ATTR_GROUP_REPORTER, groups.get(20).toArray());
@@ -553,7 +571,7 @@ public class UserProcessing extends ObjectProcessing {
 				requestSSHKey = new HttpGet(uriBuilder.build());
 			} catch (URISyntaxException e) {
 				StringBuilder sb = new StringBuilder();
-				sb.append("It was not possible create URI from UriBuider; ").append(e.getLocalizedMessage());
+				sb.append("It was not possible create URI from UriBuilder; ").append(e.getLocalizedMessage());
 				throw new ConnectorException(sb.toString(), e);
 			}
 			partOfsSSHKeys = callRequestForJSONArray(requestSSHKey, true);
@@ -858,4 +876,42 @@ public class UserProcessing extends ObjectProcessing {
         }
         return   groupArr; 
     }
+
+	private void putRequestedPassword(Boolean create, Set<Attribute> attributes, JSONObject json) {
+
+		LOGGER.info("putRequestedPassword attributes: {0}, json: {1}", attributes.toString(), json.toString());
+
+		final StringBuilder sbPass = new StringBuilder();
+
+		GuardedString pass = getAttr(attributes, OperationalAttributes.PASSWORD_NAME, GuardedString.class, null);
+
+		if (pass != null) {
+			pass.access(new GuardedString.Accessor() {
+				@Override
+				public void access(char[] chars) {
+					sbPass.append(new String(chars));
+				}
+			});
+
+			json.put(ATTR_PASSWORD, sbPass.toString());
+
+		} else if (create) {
+			boolean resetPassword = getAttr(attributes, ATTR_RESET_PASSWORD, Boolean.class, false);
+			if (resetPassword) {
+				json.put(ATTR_RESET_PASSWORD, true);
+			}
+			boolean forceRandomPassword = getAttr(attributes, ATTR_FORCE_RANDOM_PASSWORD, Boolean.class, false);
+			if (forceRandomPassword) {
+				json.put(ATTR_FORCE_RANDOM_PASSWORD, true);
+			}
+
+			if (!resetPassword && !forceRandomPassword) {
+				StringBuilder sb = new StringBuilder();
+				sb.append("Missing value of required attribute:").append(OperationalAttributes.PASSWORD_NAME)
+						.append("; for creating user");
+				LOGGER.error(sb.toString());
+				throw new InvalidAttributeValueException(sb.toString());
+			}
+		}
+	}
 }
