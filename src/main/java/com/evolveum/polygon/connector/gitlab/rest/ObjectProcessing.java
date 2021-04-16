@@ -59,6 +59,7 @@ import org.identityconnectors.framework.common.exceptions.PreconditionFailedExce
 import org.identityconnectors.framework.common.exceptions.UnknownUidException;
 import org.identityconnectors.framework.common.objects.Attribute;
 import org.identityconnectors.framework.common.objects.ConnectorObjectBuilder;
+import org.identityconnectors.framework.common.objects.Name;
 import org.identityconnectors.framework.common.objects.OperationOptions;
 import org.identityconnectors.framework.common.objects.Uid;
 import org.identityconnectors.framework.common.objects.filter.Filter;
@@ -312,6 +313,10 @@ public class ObjectProcessing {
 	}
 
 	protected Uid createPutOrPostRequest(Uid uid, String path, JSONObject json, Boolean create) {
+		return createPutOrPostRequest(uid, path, json, create, null);
+	}
+
+	protected Uid createPutOrPostRequest(Uid uid, String path, JSONObject json, Boolean create, String nameHintKey) {
 		URIBuilder uriBuilder = getURIBuilder();
 
 		URI uri;
@@ -350,6 +355,14 @@ public class ObjectProcessing {
 		int id = jsonOutput.getInt("id");
 		String stringId = String.valueOf(id);
 		LOGGER.info("acquired uid: {0}", stringId);
+
+		if (nameHintKey != null) {
+			String nameValue = jsonOutput.getString(nameHintKey);
+			if (nameValue != null) {
+				Name nameHint = new Name(nameValue);
+				return new Uid(stringId, nameHint);
+			}
+		}
 		return new Uid(stringId);
 	}
 	
@@ -410,24 +423,11 @@ public class ObjectProcessing {
 	
 	protected void putRequestedAttrIfExists(Boolean create, Set<Attribute> attributes, String attrNameFromMP,
 			JSONObject json) {
-
-		LOGGER.info("putRequestedAttrIfExists create {0}, attributes: {1}, attrNameFromMP: {2} json: {3}",create.toString(), attributes.toString(), attrNameFromMP, json.toString());
-
-		// put mandatory attribute
-		String valueAttr = getAttr(attributes, attrNameFromMP, String.class, null);
-		if (create && (StringUtil.isBlank(valueAttr) || valueAttr == null)) {
-			StringBuilder sb = new StringBuilder();
-			sb.append("Missing value of required attribute:").append(attrNameFromMP).append("; for creating group");
-			LOGGER.error(sb.toString());
-			throw new InvalidAttributeValueException(sb.toString());
-		}
-		if (valueAttr != null) {
-			json.put(attrNameFromMP, valueAttr);
-		}
+		putRequestedAttrIfExists(create, attributes, attrNameFromMP, json, null);
 	}
 
 	protected void putRequestedAttrIfExists(Boolean create, Set<Attribute> attributes, String attrNameFromMP,
-			JSONObject json, String attrNameToGitlab) {
+											JSONObject json, String attrNameToGitlab) {
 
 		LOGGER.info("putRequestedAttrIfExists create {0}, attributes: {1}, attrNameFromMP: {2} json: {3}, attrNameToGitlab: {4}", create.toString(), attributes.toString(), attrNameFromMP, json.toString(), attrNameToGitlab);
 
@@ -791,10 +791,14 @@ public class ObjectProcessing {
 		String message = sbMessage.toString();
 		LOGGER.error("{0}", message);
 		if (statusCode == 400 || statusCode == 405 || statusCode == 406) {
-			if (message.contains("password")){
+			if (message.contains("password")) {
 				responseClose(response);
 				throw new InvalidPasswordException(message);
-			}else {
+			} else if (message.contains("\\\"has already been taken\\\"")) {
+				// Group and Project return 400 error if they already exist
+				responseClose(response);
+				throw new AlreadyExistsException(message);
+			} else {
 				responseClose(response);
 				throw new ConnectorIOException(message);
 			}

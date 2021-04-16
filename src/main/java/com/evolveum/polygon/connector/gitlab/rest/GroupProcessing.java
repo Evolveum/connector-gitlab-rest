@@ -35,6 +35,7 @@ import org.identityconnectors.framework.common.objects.AttributeDelta;
 import org.identityconnectors.framework.common.objects.AttributeInfoBuilder;
 import org.identityconnectors.framework.common.objects.ConnectorObject;
 import org.identityconnectors.framework.common.objects.ConnectorObjectBuilder;
+import org.identityconnectors.framework.common.objects.Name;
 import org.identityconnectors.framework.common.objects.ObjectClass;
 import org.identityconnectors.framework.common.objects.ObjectClassInfoBuilder;
 import org.identityconnectors.framework.common.objects.OperationOptions;
@@ -69,13 +70,20 @@ public class GroupProcessing extends GroupOrProjectProcessing {
 
 		// required
 		// ATTR_NAME and ATTR_PATH are required for creating groups
-		AttributeInfoBuilder attrPathBuilder = new AttributeInfoBuilder(ATTR_PATH);
-		attrPathBuilder.setRequired(true).setType(String.class).setCreateable(true).setUpdateable(true)
+		// However, we don't define ATTR_PATH as createable and updateable because we handle it from the value of ATTR_FULL_PATH which is
+		// defined as secondary identifier (__NAME__)
+		AttributeInfoBuilder attrNameBuilder = new AttributeInfoBuilder(ATTR_NAME);
+		attrNameBuilder.setRequired(true).setType(String.class).setCreateable(true).setUpdateable(true)
 				.setReadable(true);
-		groupObjClassBuilder.addAttributeInfo(attrPathBuilder.build());
+		groupObjClassBuilder.addAttributeInfo(attrNameBuilder.build());
 
 		// optional
 		//createable: FALSE && updateable: FALSE && readable: TRUE
+		AttributeInfoBuilder attrPathBuilder = new AttributeInfoBuilder(ATTR_PATH);
+		attrPathBuilder.setRequired(true).setType(String.class).setCreateable(false).setUpdateable(false)
+				.setReadable(true);
+		groupObjClassBuilder.addAttributeInfo(attrPathBuilder.build());
+
 		AttributeInfoBuilder attrAvatarUrlBuilder = new AttributeInfoBuilder(ATTR_AVATAR_URL);
 		attrAvatarUrlBuilder.setType(String.class).setCreateable(false).setUpdateable(false).setReadable(true);
 		groupObjClassBuilder.addAttributeInfo(attrAvatarUrlBuilder.build());
@@ -174,8 +182,8 @@ public class GroupProcessing extends GroupOrProjectProcessing {
 		JSONObject json = new JSONObject();
 
 		// mandatory attributes
-		putRequestedAttrIfExists(create, attributes, "__NAME__", json, ATTR_NAME);
-		putRequestedAttrIfExists(create, attributes, ATTR_PATH, json);
+		putRequestedAttrIfExists(create, attributes, ATTR_NAME, json);
+		putRequestedAttrIfExists(create, attributes, Name.NAME, json, ATTR_PATH);
 
 		// optional attributes
 		putAttrIfExists(attributes, ATTR_DESCRIPTION, String.class, json);
@@ -186,12 +194,30 @@ public class GroupProcessing extends GroupOrProjectProcessing {
 		putAttrIfExists(attributes, ATTR_SHARE_WITH_GROUP_LOCK, Boolean.class, json);
 		putAttrIfExists(attributes, ATTR_PARENT_ID, Integer.class, json);
 
+		if (json.has(ATTR_PATH) && json.getString(ATTR_PATH).contains("/")) {
+			// determine the path from fullPath
+			String fullPath = json.getString(ATTR_PATH);
+			String[] s = fullPath.split("/");
+			String path = s[s.length - 1];
+			json.put(ATTR_PATH, path);
+
+			// If no parentId, find it by the specified fullPath
+			if (!json.has(ATTR_PARENT_ID) && s.length > 1) {
+				String parentFullPath = fullPath.substring(0, fullPath.lastIndexOf('/'));
+
+				JSONObject parent = findGroupByFullPath(parentFullPath, operationOptions);
+				if (parent != null) {
+				    json.put(ATTR_PARENT_ID, parent.getInt(UID));
+				}
+			}
+		}
+
 		LOGGER.info("Group request: {0}", json.toString());
 		LOGGER.info("Json  length: {0}", json.length());
 
 		Uid returnUid = null;
 		if (json.length() != 0) {
-			returnUid = createPutOrPostRequest(uid, GROUPS, json, create);
+			returnUid = createPutOrPostRequest(uid, GROUPS, json, create, ATTR_FULL_PATH);
 		}
 		return returnUid;
 	}
@@ -201,8 +227,9 @@ public class GroupProcessing extends GroupOrProjectProcessing {
 		builder.setObjectClass(ObjectClass.GROUP);
 
 		getUIDIfExists(group, UID, builder);
-		getNAMEIfExists(group, ATTR_NAME, builder);
+		getNAMEIfExists(group, ATTR_FULL_PATH, builder);
 
+		getIfExists(group, ATTR_NAME, String.class, builder);
 		getIfExists(group, ATTR_PATH, String.class, builder);
 		getIfExists(group, ATTR_WEB_URL, String.class, builder);
 		getIfExists(group, ATTR_DESCRIPTION, String.class, builder);
@@ -236,6 +263,19 @@ public class GroupProcessing extends GroupOrProjectProcessing {
 				JSONObject group = (JSONObject) executeGetRequest(sbPath.toString(), null,
 						options, false);
 				processingObjectFromGET(group, handler, sbPath.toString());
+
+			}  else if (((EqualsFilter) query).getAttribute() instanceof Name) {
+
+				Name name = (Name) ((EqualsFilter) query).getAttribute();
+				if (name.getNameValue() == null) {
+					invalidAttributeValue("Name", query);
+				}
+				JSONObject group = findGroupByFullPath(name.getNameValue(), options);
+				if (group != null) {
+					StringBuilder sbPath = new StringBuilder();
+					sbPath.append(GROUPS).append("/").append(group.getInt(UID));
+					processingObjectFromGET(group, handler, sbPath.toString());
+				}
 
 			} else {
 				StringBuilder sb = new StringBuilder();
@@ -362,6 +402,21 @@ public class GroupProcessing extends GroupOrProjectProcessing {
 			LOGGER.error(sb.toString());
 			throw new ConnectorIOException(sb.toString());
 		}
+	}
+
+	private JSONObject findGroupByFullPath(String fullPath, OperationOptions options) {
+		Map<String, String> parameters = new HashMap<>();
+		parameters.put("search", fullPath);
+		JSONArray groups = (JSONArray) executeGetRequest(GROUPS, parameters, options, true);
+
+		for (int i = 0; i < groups.length(); i++) {
+			JSONObject group = groups.getJSONObject(i);
+			// full_path is case-insensitive
+			if (group.getString(ATTR_FULL_PATH).equalsIgnoreCase(fullPath)) {
+				return group;
+			}
+		}
+		return null;
 	}
 	
 	private void processingObjectFromGET(JSONObject group, ResultsHandler handler, String sbPath) {
