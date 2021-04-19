@@ -120,11 +120,11 @@ public class GroupProcessing extends GroupOrProjectProcessing {
 		groupObjClassBuilder.addAttributeInfo(attrMembershipLockBuilder.build());
 		
 		AttributeInfoBuilder attrShareWithGroupLockBuilder = new AttributeInfoBuilder(ATTR_SHARE_WITH_GROUP_LOCK);
-		attrShareWithGroupLockBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(true).setReadable(false).setReturnedByDefault(false);
+		attrShareWithGroupLockBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(true).setReadable(true);
 		groupObjClassBuilder.addAttributeInfo(attrShareWithGroupLockBuilder.build());
 		
 		AttributeInfoBuilder attrParentIdBuilder = new AttributeInfoBuilder(ATTR_PARENT_ID);
-		attrParentIdBuilder.setType(Integer.class).setCreateable(true).setUpdateable(true).setReadable(false).setReturnedByDefault(false);
+		attrParentIdBuilder.setType(Integer.class).setCreateable(true).setUpdateable(true).setReadable(true);
 		groupObjClassBuilder.addAttributeInfo(attrParentIdBuilder.build());
 		
 		//multivalued: TRUE && createable: FALSE && updateable: FALSE && readable: TRUE
@@ -209,6 +209,7 @@ public class GroupProcessing extends GroupOrProjectProcessing {
 		getIfExists(group, ATTR_VISIBILITY, String.class, builder);
 		getIfExists(group, ATTR_LFS_ENABLED, Boolean.class, builder);
 		getIfExists(group, ATTR_REQUEST_ACCESS_ENABLED, Boolean.class, builder);
+		getIfExists(group, ATTR_SHARE_WITH_GROUP_LOCK, Boolean.class, builder);
 		getIfExists(group, ATTR_PARENT_ID, Integer.class, builder);
 		getIfExists(group, ATTR_FULL_NAME, String.class, builder);
 		getIfExists(group, ATTR_FULL_PATH, String.class, builder);
