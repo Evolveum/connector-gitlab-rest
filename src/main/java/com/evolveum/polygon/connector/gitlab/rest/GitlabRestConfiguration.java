@@ -32,9 +32,10 @@ public class GitlabRestConfiguration extends AbstractConfiguration implements St
 
 
 	private String loginUrl;
-        private String protocol;
+    private String protocol;
 	private GuardedString privateToken;
-        private String groupsToManage;
+    private String groupsToManage;
+    private String objectAvatar;
 	private static final Log LOGGER = Log.getLog(GitlabRestConnector.class);
         
 
@@ -62,25 +63,42 @@ public class GitlabRestConfiguration extends AbstractConfiguration implements St
 		this.loginUrl = loginURL;
 	}
         
-        // Add protocol configuration property to support https        
-        @ConfigurationProperty(order = 4, displayMessageKey = "protocol.display", helpMessageKey = "protocol.help", required = false, confidential = false)
+    // Add protocol configuration property to support https        
+    @ConfigurationProperty(order = 4, displayMessageKey = "protocol.display", helpMessageKey = "protocol.help", required = false, confidential = false)
 	public String getProtocol() {
-		return protocol;
+	    return protocol;
 	}
+       
+    // Add groupsToManage configuration property to limit number of groups and memberships in these groupd that will be managed by connector. If null or empty then all groups. Symbol Coma "," is delimiter       
+    @ConfigurationProperty(order = 5, displayMessageKey = "groupsToManage.display", helpMessageKey = "groupsToManage.help", required = false, confidential = false)
+
+    public String getGroupsToManage() {
+        return groupsToManage;
+    }
+
+    
+    // Add objectAvatar configuration property to support choose objectAvatar is selected or no by Groups and Project
+    // Workaroud for issue https://gitlab.com/gitlab-org/gitlab/-/issues/25498
+    //@ConfigurationProperty(order = 6, displayMessageKey = "objectAvatar.display", helpMessageKey = "objectAvatar.help", required = true, confidential = false)
+    
+    public String getObjectAvatar() {
+	    return objectAvatar;
+    }    
+    
+    public void setGroupsToManage(String groupsToManage) {
+         this.groupsToManage = groupsToManage;
+    }
+
+    public void setProtocol(String protocol) {
+         this.protocol = protocol;
+    }
+    
+    public void setObjectAvatar(String objectAvatar) {
+    	this.objectAvatar = objectAvatar;
+    }
+    
         
-        // Add groupsToManage configuration property to limit number of groups and memberships in these groupd that will be managed by connector. If null or empty then all groups. Symbol Coma "," is delimiter       
-        @ConfigurationProperty(order = 5, displayMessageKey = "groupsToManage.display", helpMessageKey = "groupsToManage.help", required = false, confidential = false)
-        public String getGroupsToManage() {
-            return groupsToManage;
-        }
-
-        public void setGroupsToManage(String groupsToManage) {
-            this.groupsToManage = groupsToManage;
-        }
-
-        public void setProtocol(String protocol) {
-            this.protocol = protocol;
-        }
+	    
 
 	@Override
 	public void validate() {
@@ -92,9 +110,13 @@ public class GitlabRestConfiguration extends AbstractConfiguration implements St
 			throw new ConfigurationException("Private Token cannot be empty.");
 		}
                 
-                if (protocol==null || !(protocol.equals("http") || protocol.equals("https") || protocol.isEmpty())) {
-			throw new ConfigurationException("Protocol should be http or https.");
+        if (protocol==null || !(protocol.equals("http") || protocol.equals("https") || protocol.isEmpty())) {
+		    throw new ConfigurationException("Protocol should be http or https.");
+        }
+		if (objectAvatar==null || !(objectAvatar.equals("true") || objectAvatar.equals("false") || objectAvatar.isEmpty())) {
+			throw new ConfigurationException("objectAvatar should be true or false.");
 		}
+		
 		LOGGER.info("Configuration valid");
 	}
 	

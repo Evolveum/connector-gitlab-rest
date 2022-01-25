@@ -36,6 +36,7 @@ import org.identityconnectors.framework.common.objects.AttributeDelta;
 import org.identityconnectors.framework.common.objects.AttributeInfoBuilder;
 import org.identityconnectors.framework.common.objects.ConnectorObject;
 import org.identityconnectors.framework.common.objects.ConnectorObjectBuilder;
+import org.identityconnectors.framework.common.objects.Name;
 import org.identityconnectors.framework.common.objects.ObjectClass;
 import org.identityconnectors.framework.common.objects.ObjectClassInfoBuilder;
 import org.identityconnectors.framework.common.objects.OperationOptions;
@@ -388,6 +389,7 @@ public class ProjectProcessing extends GroupOrProjectProcessing {
 
 		// mandatory attributes
 		putRequestedAttrIfExists(create, attributes, "__NAME__", json, ATTR_NAME);
+		putRequestedAttrIfExists(create, attributes, Name.NAME, json, ATTR_PATH_WITH_NAMESPACE);
 
 		// optional attributes
 		putAttrIfExists(attributes, ATTR_PATH, String.class, json);
@@ -412,7 +414,9 @@ public class ProjectProcessing extends GroupOrProjectProcessing {
 		
 		LOGGER.info("Project request: {0}", json.toString());
 
-		return createPutOrPostRequest(uid, PROJECTS, json, create);
+		// Handling the case of Projects with fullpath
+		return createPutOrPostRequest(uid, PROJECTS, json, create, ATTR_PATH_WITH_NAMESPACE);
+		//return createPutOrPostRequest(uid, PROJECTS, json, create);
 	}
 	
 	protected void putTagListIfExists(Set<Attribute> attributes, JSONObject json) {
@@ -435,7 +439,8 @@ public class ProjectProcessing extends GroupOrProjectProcessing {
 		builder.setObjectClass(new ObjectClass(PROJECT_NAME));
 
 		getUIDIfExists(project, UID, builder);
-		getNAMEIfExists(project, ATTR_NAME, builder);
+		//getNAMEIfExists(project, ATTR_NAME, builder);
+		getNAMEIfExists(project, ATTR_PATH_WITH_NAMESPACE, builder);
 
 		getIfExists(project, ATTR_PATH, String.class, builder);
 		getIfExists(project, ATTR_DEFAULT_BRANCH, String.class, builder);
