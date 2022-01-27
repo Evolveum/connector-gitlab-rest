@@ -575,6 +575,11 @@ public class ObjectProcessing {
 
 	protected byte[] getAvatarPhoto(JSONObject object, String attrURLName, String attrName) {
 
+
+		if (this.configuration.getObjectAvatar().equals("false")) {
+			return null;
+		}
+		
 		if (object.has(attrURLName) && object.get(attrURLName) != null
 				&& !JSONObject.NULL.equals(object.get(attrURLName))) {
 
