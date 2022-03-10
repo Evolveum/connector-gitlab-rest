@@ -21,10 +21,8 @@ package com.evolveum.polygon.connector.gitlab.rest;
  */
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -56,8 +54,8 @@ import org.identityconnectors.framework.spi.operations.UpdateDeltaOp;
 import org.identityconnectors.framework.spi.operations.DeleteOp;
 
 @ConnectorClass(displayNameKey = "connector.gitlab.rest.display", configurationClass = GitlabRestConfiguration.class)
-public class GitlabRestConnector implements TestOp, SchemaOp, Connector, CreateOp, DeleteOp, UpdateDeltaOp,
-		SearchOp<Filter> {
+public class GitlabRestConnector
+		implements TestOp, SchemaOp, Connector, CreateOp, DeleteOp, UpdateDeltaOp, SearchOp<Filter> {
 
 	private static final Log LOGGER = Log.getLog(GitlabRestConnector.class);
 	private GitlabRestConfiguration configuration;
@@ -65,7 +63,7 @@ public class GitlabRestConnector implements TestOp, SchemaOp, Connector, CreateO
 	private static final String USERS = "/users";
 	private static final String GROUPS = "/groups";
 	private static final String PROJECTS = "/projects";
-	
+
 	private static final String PROJECT_NAME = "Project";
 
 	private Schema schema = null;
@@ -76,10 +74,6 @@ public class GitlabRestConnector implements TestOp, SchemaOp, Connector, CreateO
 		ObjectProcessing objectProcessing = new ObjectProcessing(configuration, httpclient);
 		objectProcessing.test();
 	}
-	
-	
-	
-	
 
 	@Override
 	public void init(Configuration configuration) {
@@ -197,12 +191,12 @@ public class GitlabRestConnector implements TestOp, SchemaOp, Connector, CreateO
 			LOGGER.error("Attribute of type ResultsHandler not provided.");
 			throw new InvalidAttributeValueException("Attribute of type ResultsHandler is not provided.");
 		}
-		
+
 		if (options == null) {
 			LOGGER.error("Attribute of type OperationOptions not provided.");
 			throw new InvalidAttributeValueException("Attribute of type OperationOptions is not provided.");
 		}
-               
+
 		LOGGER.info("executeQuery on {0}, filter: {1}, options: {2}", objectClass, query, options);
 
 		if (objectClass.is(ObjectClass.ACCOUNT_NAME)) {
@@ -230,7 +224,7 @@ public class GitlabRestConnector implements TestOp, SchemaOp, Connector, CreateO
 	@Override
 	public Set<AttributeDelta> updateDelta(ObjectClass objectClass, Uid uid, Set<AttributeDelta> attrsDelta,
 			OperationOptions options) {
-		
+
 		if (objectClass == null) {
 			LOGGER.error("Parameter of type ObjectClass not provided.");
 			throw new InvalidAttributeValueException("Parameter of type ObjectClass not provided.");
@@ -245,58 +239,59 @@ public class GitlabRestConnector implements TestOp, SchemaOp, Connector, CreateO
 			LOGGER.error("Parameter of type Set<AttributeDelta> not provided.");
 			throw new InvalidAttributeValueException("Parameter of type Set<AttributeDelta> not provided.");
 		}
-		
+
 		if (options == null) {
 			LOGGER.error("Parameter of type OperationOptions not provided.");
 			throw new InvalidAttributeValueException("Parameter of type OperationOptions not provided.");
 		}
 
-		LOGGER.info("updateDelta on {0}, uid: {1}, attrDelta: {2}, options: {3}", objectClass, uid.getValue(), attrsDelta,options);
-		
+		LOGGER.info("updateDelta on {0}, uid: {1}, attrDelta: {2}, options: {3}", objectClass, uid.getValue(),
+				attrsDelta, options);
+
 		Set<Attribute> attributeReplace = new HashSet<Attribute>();
 		Set<AttributeDelta> attrsDeltaMultivalue = new HashSet<AttributeDelta>();
-		for (AttributeDelta attrDelta : attrsDelta){
+		for (AttributeDelta attrDelta : attrsDelta) {
 			List<Object> replaceValue = attrDelta.getValuesToReplace();
-			if(replaceValue != null){
+			if (replaceValue != null) {
 				attributeReplace.add(AttributeBuilder.build(attrDelta.getName(), replaceValue));
 			} else {
 				attrsDeltaMultivalue.add(attrDelta);
 			}
 		}
-		
+
 		if (objectClass.is(ObjectClass.ACCOUNT_NAME)) { // __ACCOUNT__
 			Set<AttributeDelta> ret = new HashSet<AttributeDelta>();
 			Uid newUid = null;
-			if(!attributeReplace.isEmpty()){
+			if (!attributeReplace.isEmpty()) {
 				UserProcessing userProcessing = new UserProcessing(configuration, httpclient);
 				newUid = userProcessing.createOrUpdateUser(uid, attributeReplace);
 			}
-			if(!attrsDeltaMultivalue.isEmpty()){
+			if (!attrsDeltaMultivalue.isEmpty()) {
 				UserProcessing userProcessing = new UserProcessing(configuration, httpclient);
 				userProcessing.updateDeltaMultiValues(uid, attrsDeltaMultivalue, options);
 			}
-			if(newUid == null ||newUid.equals(uid)){
+			if (newUid == null || newUid.equals(uid)) {
 				return ret;
 			} else {
-					
+
 				AttributeDelta newUidAttributeDelta = AttributeDeltaBuilder.build(Uid.NAME, newUid.getValue());
 				ret.add(newUidAttributeDelta);
 				return ret;
 			}
-			
+
 		} else if (objectClass.is(ObjectClass.GROUP_NAME)) { // __GROUP__
 			Set<AttributeDelta> ret = new HashSet<AttributeDelta>();
 			Uid newUid = null;
-			if(!attributeReplace.isEmpty()){
-			GroupProcessing groupProcessing = new GroupProcessing(configuration, httpclient);
-			newUid = groupProcessing.createOrUpdateGroup(uid, attributeReplace, options);
+			if (!attributeReplace.isEmpty()) {
+				GroupProcessing groupProcessing = new GroupProcessing(configuration, httpclient);
+				newUid = groupProcessing.createOrUpdateGroup(uid, attributeReplace, options);
 			}
-			if(!attrsDeltaMultivalue.isEmpty()){
+			if (!attrsDeltaMultivalue.isEmpty()) {
 				GroupProcessing groupProcessing = new GroupProcessing(configuration, httpclient);
 				groupProcessing.updateDeltaMultiValues(uid, attrsDeltaMultivalue, options);
 			}
-			if(newUid == null || newUid.equals(uid)){
-				return ret; 
+			if (newUid == null || newUid.equals(uid)) {
+				return ret;
 			} else {
 				AttributeDelta newUidAttributeDelta = AttributeDeltaBuilder.build(Uid.NAME, newUid.getValue());
 				ret.add(newUidAttributeDelta);
@@ -306,23 +301,22 @@ public class GitlabRestConnector implements TestOp, SchemaOp, Connector, CreateO
 		if (objectClass.is(PROJECT_NAME)) { // Project
 			Set<AttributeDelta> ret = new HashSet<AttributeDelta>();
 			Uid newUid = null;
-			if(!attributeReplace.isEmpty()){
-			ProjectProcessing projectProcessing = new ProjectProcessing(configuration, httpclient);
-			newUid = projectProcessing.createOrUpdateProject(uid, attributeReplace, options);
+			if (!attributeReplace.isEmpty()) {
+				ProjectProcessing projectProcessing = new ProjectProcessing(configuration, httpclient);
+				newUid = projectProcessing.createOrUpdateProject(uid, attributeReplace, options);
 			}
-			if(!attrsDeltaMultivalue.isEmpty()){
+			if (!attrsDeltaMultivalue.isEmpty()) {
 				ProjectProcessing projectProcessing = new ProjectProcessing(configuration, httpclient);
 				projectProcessing.updateDeltaMultiValues(uid, attrsDeltaMultivalue, options);
 			}
-			if(newUid == null || newUid.equals(uid)){
-				return ret; 
+			if (newUid == null || newUid.equals(uid)) {
+				return ret;
 			} else {
 				AttributeDelta newUidAttributeDelta = AttributeDeltaBuilder.build(Uid.NAME, newUid.getValue());
 				ret.add(newUidAttributeDelta);
 				return ret;
 			}
-		}
-		else {
+		} else {
 			LOGGER.error("The value of the ObjectClass parameter is unsupported.");
 			throw new UnsupportedOperationException("The value of the ObjectClass parameter is unsupported.");
 		}

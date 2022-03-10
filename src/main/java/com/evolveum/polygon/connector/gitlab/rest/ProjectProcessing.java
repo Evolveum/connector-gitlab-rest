@@ -95,7 +95,7 @@ public class ProjectProcessing extends GroupOrProjectProcessing {
 	private static final String ATTR_OWNER_STATE = "owner.state";
 	private static final String ATTR_OWNER_AVATAR_URL = "owner.avatar_url";
 	private static final String ATTR_OWNER_WEB_URL = "owner.web_url";
-	
+
 	private static final String ATTR_SHARED_WITH_GROUPS_ID_MAX_GUEST = "shared_with_groups_max_guest";
 	private static final String ATTR_SHARED_WITH_GROUPS_ID_MAX_REPORTER = "shared_with_groups_reporter";
 	private static final String ATTR_SHARED_WITH_GROUPS_ID_MAX_DEVELOPER = "shared_with_groups_max_developer";
@@ -117,264 +117,300 @@ public class ProjectProcessing extends GroupOrProjectProcessing {
 		projectObjClassBuilder.setType(PROJECT_NAME);
 
 		// optional
-		//createable: TRUE && updateable: TRUE && readable: TRUE
+		// createable: TRUE && updateable: TRUE && readable: TRUE
 		AttributeInfoBuilder attrPathBuilder = new AttributeInfoBuilder(ATTR_PATH);
 		attrPathBuilder.setType(String.class).setCreateable(true).setUpdateable(true).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrPathBuilder.build());
-		
+
 		AttributeInfoBuilder attrDescriptionBuilder = new AttributeInfoBuilder(ATTR_DESCRIPTION);
 		attrDescriptionBuilder.setType(String.class).setCreateable(true).setUpdateable(true).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrDescriptionBuilder.build());
-		
+
 		AttributeInfoBuilder attrDefaultBranchBuilder = new AttributeInfoBuilder(ATTR_DEFAULT_BRANCH);
-		attrDefaultBranchBuilder.setType(String.class).setCreateable(false).setUpdateable(true).setReadable(true).setReturnedByDefault(true);
+		attrDefaultBranchBuilder.setType(String.class).setCreateable(false).setUpdateable(true).setReadable(true)
+				.setReturnedByDefault(true);
 		projectObjClassBuilder.addAttributeInfo(attrDefaultBranchBuilder.build());
-		
+
 		// attr visibility can be private, internal, or public
 		AttributeInfoBuilder attrVisibilityLevelBuilder = new AttributeInfoBuilder(ATTR_VISIBILITY);
 		attrVisibilityLevelBuilder.setType(String.class).setCreateable(true).setUpdateable(true).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrVisibilityLevelBuilder.build());
-		
+
 		AttributeInfoBuilder attrLfsEnabledBuilder = new AttributeInfoBuilder(ATTR_LFS_ENABLED);
 		attrLfsEnabledBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(true).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrLfsEnabledBuilder.build());
-		
+
 		AttributeInfoBuilder attrRequestAccessEnabledBuilder = new AttributeInfoBuilder(ATTR_REQUEST_ACCESS_ENABLED);
-		attrRequestAccessEnabledBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(true).setReadable(true);
+		attrRequestAccessEnabledBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(true)
+				.setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrRequestAccessEnabledBuilder.build());
-		
+
 		AttributeInfoBuilder attrPublicBuilder = new AttributeInfoBuilder(ATTR_PUBLIC_JOBS);
 		attrPublicBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(true).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrPublicBuilder.build());
-		
-		AttributeInfoBuilder attrContainerRegistryEnabledBuilder = new AttributeInfoBuilder(ATTR_CONTAINER_REGISTRY_ENABLED);
-		attrContainerRegistryEnabledBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(true).setReadable(true);
+
+		AttributeInfoBuilder attrContainerRegistryEnabledBuilder = new AttributeInfoBuilder(
+				ATTR_CONTAINER_REGISTRY_ENABLED);
+		attrContainerRegistryEnabledBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(true)
+				.setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrContainerRegistryEnabledBuilder.build());
-		
+
 		AttributeInfoBuilder attrIssuesEnabledBuilder = new AttributeInfoBuilder(ATTR_ISSUES_ENABLED);
 		attrIssuesEnabledBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(true).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrIssuesEnabledBuilder.build());
-		
+
 		AttributeInfoBuilder attrMergeRequestsEnabledBuilder = new AttributeInfoBuilder(ATTR_MERGE_REQUESTS_ENABLED);
-		attrMergeRequestsEnabledBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(true).setReadable(true);
+		attrMergeRequestsEnabledBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(true)
+				.setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrMergeRequestsEnabledBuilder.build());
-		
+
 		AttributeInfoBuilder attrWikiEnabledBuilder = new AttributeInfoBuilder(ATTR_WIKI_ENABLED);
 		attrWikiEnabledBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(true).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrWikiEnabledBuilder.build());
-		
+
 //		AttributeInfoBuilder attrBuildsEnabledBuilder = new AttributeInfoBuilder(ATTR_BUILDS_ENABLED);
 //		attrBuildsEnabledBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(true).setReadable(true);
 //		projectObjClassBuilder.addAttributeInfo(attrBuildsEnabledBuilder.build());
-		
+
 		AttributeInfoBuilder attrSnippetsEnabledBuilder = new AttributeInfoBuilder(ATTR_SNIPPETS_ENABLED);
 		attrSnippetsEnabledBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(true).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrSnippetsEnabledBuilder.build());
-		
+
 		AttributeInfoBuilder attrSharedRunnersEnabledBuilder = new AttributeInfoBuilder(ATTR_SHARED_RUNNERS_ENABLED);
-		attrSharedRunnersEnabledBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(true).setReadable(true);
+		attrSharedRunnersEnabledBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(true)
+				.setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrSharedRunnersEnabledBuilder.build());
-		
+
 		AttributeInfoBuilder attrJobsEnabledBuilder = new AttributeInfoBuilder(ATTR_JOBS_ENABLED);
 		attrJobsEnabledBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(true).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrJobsEnabledBuilder.build());
-		
+
 //		AttributeInfoBuilder attrOnlyAllowMergeIfBuildSucceeedsBuilder = new AttributeInfoBuilder(ATTR_ONLY_ALLOW_MERGE_IF_BUILD_SUCCEEDS);
 //		attrOnlyAllowMergeIfBuildSucceeedsBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(true).setReadable(true);
 //		projectObjClassBuilder.addAttributeInfo(attrOnlyAllowMergeIfBuildSucceeedsBuilder.build());
-		
-		AttributeInfoBuilder attrOnlyAllowMergeIfPipelineSucceeedsBuilder = new AttributeInfoBuilder(ATTR_ONLY_ALLOW_MERGE_IF_PIPELINE_SUCCEEDS);
-		attrOnlyAllowMergeIfPipelineSucceeedsBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(true).setReadable(true);
+
+		AttributeInfoBuilder attrOnlyAllowMergeIfPipelineSucceeedsBuilder = new AttributeInfoBuilder(
+				ATTR_ONLY_ALLOW_MERGE_IF_PIPELINE_SUCCEEDS);
+		attrOnlyAllowMergeIfPipelineSucceeedsBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(true)
+				.setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrOnlyAllowMergeIfPipelineSucceeedsBuilder.build());
-		
-		AttributeInfoBuilder attrOnlyAllowMergeIfAllDiscussionsAreResolvedBuilder = new AttributeInfoBuilder(ATTR_ONLY_ALLOW_MERGE_IF_ALL_DISCUSSIONS_ARE_RESOLVED);
-		attrOnlyAllowMergeIfAllDiscussionsAreResolvedBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(true).setReadable(true);
+
+		AttributeInfoBuilder attrOnlyAllowMergeIfAllDiscussionsAreResolvedBuilder = new AttributeInfoBuilder(
+				ATTR_ONLY_ALLOW_MERGE_IF_ALL_DISCUSSIONS_ARE_RESOLVED);
+		attrOnlyAllowMergeIfAllDiscussionsAreResolvedBuilder.setType(Boolean.class).setCreateable(true)
+				.setUpdateable(true).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrOnlyAllowMergeIfAllDiscussionsAreResolvedBuilder.build());
-		
+
 //		//createable: TRUE && updateable: TRUE && readable: FALSE
 //		AttributeInfoBuilder attrPublicBuildsBuilder = new AttributeInfoBuilder(ATTR_PUBLIC_BUILDS);
 //		attrPublicBuildsBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(true).setReadable(false);
 //		projectObjClassBuilder.addAttributeInfo(attrPublicBuildsBuilder.build());
-		
-		//createable: FALSE && updateable: FALSE && readable: TRUE
+
+		// createable: FALSE && updateable: FALSE && readable: TRUE
 		AttributeInfoBuilder attrNameWithNamespaceBuilder = new AttributeInfoBuilder(ATTR_NAME_WITH_NAMESPACE);
 		attrNameWithNamespaceBuilder.setType(String.class).setCreateable(false).setUpdateable(false).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrNameWithNamespaceBuilder.build());
-		
+
 		AttributeInfoBuilder attrPathWithNamespaceBuilder = new AttributeInfoBuilder(ATTR_PATH_WITH_NAMESPACE);
 		attrPathWithNamespaceBuilder.setType(String.class).setCreateable(false).setUpdateable(false).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrPathWithNamespaceBuilder.build());
-		
+
 		AttributeInfoBuilder attrWebUrlBuilder = new AttributeInfoBuilder(ATTR_WEB_URL);
 		attrWebUrlBuilder.setType(String.class).setCreateable(false).setUpdateable(false).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrWebUrlBuilder.build());
-		
+
 		AttributeInfoBuilder attrArchivedBuilder = new AttributeInfoBuilder(ATTR_ARCHIVED);
 		attrArchivedBuilder.setType(Boolean.class).setCreateable(false).setUpdateable(false).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrArchivedBuilder.build());
-		
+
 		AttributeInfoBuilder attrSSHUrlToRepoBuilder = new AttributeInfoBuilder(ATTR_SSH_URL_TO_REPO);
 		attrSSHUrlToRepoBuilder.setType(String.class).setCreateable(false).setUpdateable(false).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrSSHUrlToRepoBuilder.build());
-		
+
 		AttributeInfoBuilder attrHTTPUrlToRepoBuilder = new AttributeInfoBuilder(ATTR_HTTP_URL_TO_REPO);
 		attrHTTPUrlToRepoBuilder.setType(String.class).setCreateable(false).setUpdateable(false).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrHTTPUrlToRepoBuilder.build());
-		
+
 		AttributeInfoBuilder attrCreateAtBuilder = new AttributeInfoBuilder(ATTR_CREATED_AT);
 		attrCreateAtBuilder.setType(String.class).setCreateable(false).setUpdateable(false).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrCreateAtBuilder.build());
-		
+
 		AttributeInfoBuilder attrLastActivityAtBuilder = new AttributeInfoBuilder(ATTR_LAST_ACTIVITY_AT);
 		attrLastActivityAtBuilder.setType(String.class).setCreateable(false).setUpdateable(false).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrLastActivityAtBuilder.build());
-		
+
 		AttributeInfoBuilder attrCreatorIDBuilder = new AttributeInfoBuilder(ATTR_CREATOR_ID);
 		attrCreatorIDBuilder.setType(Integer.class).setCreateable(false).setUpdateable(false).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrCreatorIDBuilder.build());
-		
+
 		AttributeInfoBuilder attrNameSpaceIdBuilder = new AttributeInfoBuilder(ATTR_NAMESPACE_ID);
 		attrNameSpaceIdBuilder.setType(String.class).setCreateable(false).setUpdateable(false).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrNameSpaceIdBuilder.build());
-		
+
 		AttributeInfoBuilder attrNameSpaceNameBuilder = new AttributeInfoBuilder(ATTR_NAMESPACE_NAME);
 		attrNameSpaceNameBuilder.setType(String.class).setCreateable(false).setUpdateable(false).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrNameSpaceNameBuilder.build());
-		
+
 		AttributeInfoBuilder attrNameSpacePathBuilder = new AttributeInfoBuilder(ATTR_NAMESPACE_PATH);
 		attrNameSpacePathBuilder.setType(String.class).setCreateable(false).setUpdateable(false).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrNameSpacePathBuilder.build());
-		
+
 		AttributeInfoBuilder attrNameSpaceKindBuilder = new AttributeInfoBuilder(ATTR_NAMESPACE_KIND);
 		attrNameSpaceKindBuilder.setType(String.class).setCreateable(false).setUpdateable(false).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrNameSpaceKindBuilder.build());
-		
+
 		AttributeInfoBuilder attrNameSpaceFullPathBuilder = new AttributeInfoBuilder(ATTR_NAMESPACE_FULL_PATH);
 		attrNameSpaceFullPathBuilder.setType(String.class).setCreateable(false).setUpdateable(false).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrNameSpaceFullPathBuilder.build());
-		
+
 		AttributeInfoBuilder attrStarCountBuilder = new AttributeInfoBuilder(ATTR_STAR_COUNT);
 		attrStarCountBuilder.setType(Integer.class).setCreateable(false).setUpdateable(false).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrStarCountBuilder.build());
-		
+
 		AttributeInfoBuilder attrForksCountBuilder = new AttributeInfoBuilder(ATTR_FORKS_COUNT);
 		attrForksCountBuilder.setType(Integer.class).setCreateable(false).setUpdateable(false).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrForksCountBuilder.build());
-		
+
 		AttributeInfoBuilder attrOpenIssuesCountBuilder = new AttributeInfoBuilder(ATTR_OPEN_ISSUES_COUNT);
 		attrOpenIssuesCountBuilder.setType(Integer.class).setCreateable(false).setUpdateable(false).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrOpenIssuesCountBuilder.build());
-		
-		AttributeInfoBuilder attrPermissionsGroupAccessLevelBuilder = new AttributeInfoBuilder(ATTR_PERMISSIONS_GROUP_ACCESS_LEVEL);
-		attrPermissionsGroupAccessLevelBuilder.setType(Integer.class).setCreateable(false).setUpdateable(false).setReadable(true);
+
+		AttributeInfoBuilder attrPermissionsGroupAccessLevelBuilder = new AttributeInfoBuilder(
+				ATTR_PERMISSIONS_GROUP_ACCESS_LEVEL);
+		attrPermissionsGroupAccessLevelBuilder.setType(Integer.class).setCreateable(false).setUpdateable(false)
+				.setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrPermissionsGroupAccessLevelBuilder.build());
-		
-		AttributeInfoBuilder attrPermissionsGroupNotificationLevelBuilder = new AttributeInfoBuilder(ATTR_PERMISSIONS_GROUP_ACCESS_NOTIFICATION_LEVEL);
-		attrPermissionsGroupNotificationLevelBuilder.setType(Integer.class).setCreateable(false).setUpdateable(false).setReadable(true);
+
+		AttributeInfoBuilder attrPermissionsGroupNotificationLevelBuilder = new AttributeInfoBuilder(
+				ATTR_PERMISSIONS_GROUP_ACCESS_NOTIFICATION_LEVEL);
+		attrPermissionsGroupNotificationLevelBuilder.setType(Integer.class).setCreateable(false).setUpdateable(false)
+				.setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrPermissionsGroupNotificationLevelBuilder.build());
-		
-		AttributeInfoBuilder attrPermissionsProjectAccessLevelBuilder = new AttributeInfoBuilder(ATTR_PERMISSIONS_PROJECT_ACCESS_LEVEL);
-		attrPermissionsProjectAccessLevelBuilder.setType(Integer.class).setCreateable(false).setUpdateable(false).setReadable(true);
+
+		AttributeInfoBuilder attrPermissionsProjectAccessLevelBuilder = new AttributeInfoBuilder(
+				ATTR_PERMISSIONS_PROJECT_ACCESS_LEVEL);
+		attrPermissionsProjectAccessLevelBuilder.setType(Integer.class).setCreateable(false).setUpdateable(false)
+				.setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrPermissionsProjectAccessLevelBuilder.build());
-		
-		AttributeInfoBuilder attrPermissionsProjectNotificationLevelBuilder = new AttributeInfoBuilder(ATTR_PERMISSIONS_PROJECT_ACCESS_NOTIFICATION_LEVEL);
-		attrPermissionsProjectNotificationLevelBuilder.setType(Integer.class).setCreateable(false).setUpdateable(false).setReadable(true);
+
+		AttributeInfoBuilder attrPermissionsProjectNotificationLevelBuilder = new AttributeInfoBuilder(
+				ATTR_PERMISSIONS_PROJECT_ACCESS_NOTIFICATION_LEVEL);
+		attrPermissionsProjectNotificationLevelBuilder.setType(Integer.class).setCreateable(false).setUpdateable(false)
+				.setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrPermissionsProjectNotificationLevelBuilder.build());
-		
+
 		AttributeInfoBuilder attrOwnerNameBuilder = new AttributeInfoBuilder(ATTR_OWNER_NAME);
 		attrOwnerNameBuilder.setType(String.class).setCreateable(false).setUpdateable(false).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrOwnerNameBuilder.build());
-		
+
 		AttributeInfoBuilder attrOwnerUsernameBuilder = new AttributeInfoBuilder(ATTR_OWNER_USERNAME);
 		attrOwnerUsernameBuilder.setType(String.class).setCreateable(false).setUpdateable(false).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrOwnerUsernameBuilder.build());
-		
+
 		AttributeInfoBuilder attrOwnerIdBuilder = new AttributeInfoBuilder(ATTR_OWNER_ID);
 		attrOwnerIdBuilder.setType(String.class).setCreateable(false).setUpdateable(false).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrOwnerIdBuilder.build());
-		
+
 		AttributeInfoBuilder attrOwnerStateBuilder = new AttributeInfoBuilder(ATTR_OWNER_STATE);
 		attrOwnerStateBuilder.setType(String.class).setCreateable(false).setUpdateable(false).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrOwnerStateBuilder.build());
-		
+
 		AttributeInfoBuilder attrOwnerAvatarUrlBuilder = new AttributeInfoBuilder(ATTR_OWNER_AVATAR_URL);
 		attrOwnerAvatarUrlBuilder.setType(String.class).setCreateable(false).setUpdateable(false).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrOwnerAvatarUrlBuilder.build());
-		
+
 		AttributeInfoBuilder attrOwnerWebUrlBuilder = new AttributeInfoBuilder(ATTR_OWNER_WEB_URL);
 		attrOwnerWebUrlBuilder.setType(String.class).setCreateable(false).setUpdateable(false).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrOwnerWebUrlBuilder.build());
-		
+
 		AttributeInfoBuilder attrAvatarUrlBuilder = new AttributeInfoBuilder(ATTR_AVATAR_URL);
 		attrAvatarUrlBuilder.setType(String.class).setCreateable(false).setUpdateable(false).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrAvatarUrlBuilder.build());
-		
+
 		AttributeInfoBuilder attrRunnersTokenBuilder = new AttributeInfoBuilder(ATTR_RUNNERS_TOKEN);
 		attrRunnersTokenBuilder.setType(String.class).setCreateable(false).setUpdateable(false).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrRunnersTokenBuilder.build());
-		
+
 		AttributeInfoBuilder attrImportStatusBuilder = new AttributeInfoBuilder(ATTR_IMPORT_STATUS);
 		attrImportStatusBuilder.setType(String.class).setCreateable(false).setUpdateable(false).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrImportStatusBuilder.build());
-		
+
 		AttributeInfoBuilder attrImportErrorBuilder = new AttributeInfoBuilder(ATTR_IMPORT_ERROR);
 		attrImportErrorBuilder.setType(String.class).setCreateable(false).setUpdateable(false).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrImportErrorBuilder.build());
-		
+
 		AttributeInfoBuilder avatarBuilder = new AttributeInfoBuilder(ATTR_AVATAR);
-		avatarBuilder.setType(byte[].class).setCreateable(false).setUpdateable(false).setReadable(true).setReturnedByDefault(true);
+		avatarBuilder.setType(byte[].class).setCreateable(false).setUpdateable(false).setReadable(true)
+				.setReturnedByDefault(true);
 		projectObjClassBuilder.addAttributeInfo(avatarBuilder.build());
-		
-		//multivalued: TRUE && createable: FALSE && updateable: FALSE && readable: TRUE
+
+		// multivalued: TRUE && createable: FALSE && updateable: FALSE && readable: TRUE
 		AttributeInfoBuilder attrSharedWithGroupsBuilder = new AttributeInfoBuilder(ATTR_SHARED_WITH_GROUPS);
-		attrSharedWithGroupsBuilder.setType(String.class).setMultiValued(true).setCreateable(false).setUpdateable(false).setReadable(true);
+		attrSharedWithGroupsBuilder.setType(String.class).setMultiValued(true).setCreateable(false).setUpdateable(false)
+				.setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrSharedWithGroupsBuilder.build());
-		
+
 		AttributeInfoBuilder attrMembersBuilder = new AttributeInfoBuilder(ATTR_MEMBERS_WITH_NAME);
-		attrMembersBuilder.setType(String.class).setMultiValued(true).setCreateable(false).setUpdateable(false).setReadable(true);
+		attrMembersBuilder.setType(String.class).setMultiValued(true).setCreateable(false).setUpdateable(false)
+				.setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrMembersBuilder.build());
-		
-		AttributeInfoBuilder attrSharedWithGroupsWithNameBuilder = new AttributeInfoBuilder(ATTR_SHARED_WITH_GROUPS_WITH_NAME);
-		attrSharedWithGroupsWithNameBuilder.setType(String.class).setMultiValued(true).setCreateable(false).setUpdateable(false).setReadable(true);
+
+		AttributeInfoBuilder attrSharedWithGroupsWithNameBuilder = new AttributeInfoBuilder(
+				ATTR_SHARED_WITH_GROUPS_WITH_NAME);
+		attrSharedWithGroupsWithNameBuilder.setType(String.class).setMultiValued(true).setCreateable(false)
+				.setUpdateable(false).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrSharedWithGroupsWithNameBuilder.build());
-		
-		//multivalued: TRUE && createable: TRUE && updateable: TRUE && readable:TRUE
+
+		// multivalued: TRUE && createable: TRUE && updateable: TRUE && readable:TRUE
 		AttributeInfoBuilder attrTagListBuilder = new AttributeInfoBuilder(ATTR_TAG_LIST);
-		attrTagListBuilder.setType(String.class).setMultiValued(true).setCreateable(true).setUpdateable(true).setReadable(true).setReturnedByDefault(true);
+		attrTagListBuilder.setType(String.class).setMultiValued(true).setCreateable(true).setUpdateable(true)
+				.setReadable(true).setReturnedByDefault(true);
 		projectObjClassBuilder.addAttributeInfo(attrTagListBuilder.build());
-		
+
 		AttributeInfoBuilder attrGuestMembersBuilder = new AttributeInfoBuilder(ATTR_GUEST_MEMBERS);
-		attrGuestMembersBuilder.setType(String.class).setMultiValued(true).setCreateable(true).setUpdateable(true).setReadable(true);
+		attrGuestMembersBuilder.setType(String.class).setMultiValued(true).setCreateable(true).setUpdateable(true)
+				.setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrGuestMembersBuilder.build());
-		
+
 		AttributeInfoBuilder attrReporterMembersBuilder = new AttributeInfoBuilder(ATTR_REPORTER_MEMBERS);
-		attrReporterMembersBuilder.setType(String.class).setMultiValued(true).setCreateable(true).setUpdateable(true).setReadable(true);
+		attrReporterMembersBuilder.setType(String.class).setMultiValued(true).setCreateable(true).setUpdateable(true)
+				.setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrReporterMembersBuilder.build());
-		
+
 		AttributeInfoBuilder attrDeveloperMembersBuilder = new AttributeInfoBuilder(ATTR_DEVELOPER_MEMBERS);
-		attrDeveloperMembersBuilder.setType(String.class).setMultiValued(true).setCreateable(true).setUpdateable(true).setReadable(true);
+		attrDeveloperMembersBuilder.setType(String.class).setMultiValued(true).setCreateable(true).setUpdateable(true)
+				.setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrDeveloperMembersBuilder.build());
-		
+
 		AttributeInfoBuilder attrMasterMembersBuilder = new AttributeInfoBuilder(ATTR_MASTER_MEMBERS);
-		attrMasterMembersBuilder.setType(String.class).setMultiValued(true).setCreateable(true).setUpdateable(true).setReadable(true);
+		attrMasterMembersBuilder.setType(String.class).setMultiValued(true).setCreateable(true).setUpdateable(true)
+				.setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrMasterMembersBuilder.build());
-		
-		AttributeInfoBuilder attrSharedWithGroupsMaxGuestBuilder = new AttributeInfoBuilder(ATTR_SHARED_WITH_GROUPS_ID_MAX_GUEST);
-		attrSharedWithGroupsMaxGuestBuilder.setType(String.class).setMultiValued(true).setCreateable(true).setUpdateable(true).setReadable(true);
+
+		AttributeInfoBuilder attrSharedWithGroupsMaxGuestBuilder = new AttributeInfoBuilder(
+				ATTR_SHARED_WITH_GROUPS_ID_MAX_GUEST);
+		attrSharedWithGroupsMaxGuestBuilder.setType(String.class).setMultiValued(true).setCreateable(true)
+				.setUpdateable(true).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrSharedWithGroupsMaxGuestBuilder.build());
-		
-		AttributeInfoBuilder attrSharedWithGroupsMaxReporterBuilder = new AttributeInfoBuilder(ATTR_SHARED_WITH_GROUPS_ID_MAX_REPORTER);
-		attrSharedWithGroupsMaxReporterBuilder.setType(String.class).setMultiValued(true).setCreateable(true).setUpdateable(true).setReadable(true);
+
+		AttributeInfoBuilder attrSharedWithGroupsMaxReporterBuilder = new AttributeInfoBuilder(
+				ATTR_SHARED_WITH_GROUPS_ID_MAX_REPORTER);
+		attrSharedWithGroupsMaxReporterBuilder.setType(String.class).setMultiValued(true).setCreateable(true)
+				.setUpdateable(true).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrSharedWithGroupsMaxReporterBuilder.build());
-		
-		AttributeInfoBuilder attrSharedWithGroupsMaxDeveloperBuilder = new AttributeInfoBuilder(ATTR_SHARED_WITH_GROUPS_ID_MAX_DEVELOPER);
-		attrSharedWithGroupsMaxDeveloperBuilder.setType(String.class).setMultiValued(true).setCreateable(true).setUpdateable(true).setReadable(true);
+
+		AttributeInfoBuilder attrSharedWithGroupsMaxDeveloperBuilder = new AttributeInfoBuilder(
+				ATTR_SHARED_WITH_GROUPS_ID_MAX_DEVELOPER);
+		attrSharedWithGroupsMaxDeveloperBuilder.setType(String.class).setMultiValued(true).setCreateable(true)
+				.setUpdateable(true).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrSharedWithGroupsMaxDeveloperBuilder.build());
-		
-		AttributeInfoBuilder attrSharedWithGroupsMaxMasterBuilder = new AttributeInfoBuilder(ATTR_SHARED_WITH_GROUPS_ID_MAX_MASTER);
-		attrSharedWithGroupsMaxMasterBuilder.setType(String.class).setMultiValued(true).setCreateable(true).setUpdateable(true).setReadable(true);
+
+		AttributeInfoBuilder attrSharedWithGroupsMaxMasterBuilder = new AttributeInfoBuilder(
+				ATTR_SHARED_WITH_GROUPS_ID_MAX_MASTER);
+		attrSharedWithGroupsMaxMasterBuilder.setType(String.class).setMultiValued(true).setCreateable(true)
+				.setUpdateable(true).setReadable(true);
 		projectObjClassBuilder.addAttributeInfo(attrSharedWithGroupsMaxMasterBuilder.build());
-				
+
 		schemaBuilder.defineObjectClass(projectObjClassBuilder.build());
 	}
 
@@ -406,19 +442,19 @@ public class ProjectProcessing extends GroupOrProjectProcessing {
 		putAttrIfExists(attributes, ATTR_VISIBILITY, String.class, json);
 		putAttrIfExists(attributes, ATTR_JOBS_ENABLED, Boolean.class, json);
 		putAttrIfExists(attributes, ATTR_REQUEST_ACCESS_ENABLED, Boolean.class, json);
-		putAttrIfExists(attributes, ATTR_ONLY_ALLOW_MERGE_IF_ALL_DISCUSSIONS_ARE_RESOLVED, Boolean.class,json);
+		putAttrIfExists(attributes, ATTR_ONLY_ALLOW_MERGE_IF_ALL_DISCUSSIONS_ARE_RESOLVED, Boolean.class, json);
 		putAttrIfExists(attributes, ATTR_ONLY_ALLOW_MERGE_IF_PIPELINE_SUCCEEDS, Boolean.class, json);
 		putAttrIfExists(attributes, ATTR_DEFAULT_BRANCH, String.class, json);
-		
+
 		putTagListIfExists(attributes, json);
-		
+
 		LOGGER.info("Project request: {0}", json.toString());
 
 		// Handling the case of Projects with fullpath
 		return createPutOrPostRequest(uid, PROJECTS, json, create, ATTR_PATH_WITH_NAMESPACE);
-		//return createPutOrPostRequest(uid, PROJECTS, json, create);
+		// return createPutOrPostRequest(uid, PROJECTS, json, create);
 	}
-	
+
 	protected void putTagListIfExists(Set<Attribute> attributes, JSONObject json) {
 
 		LOGGER.info("PutTagListIfExists attributes: {0}, json: {1}", attributes.toString(), json.toString());
@@ -429,7 +465,7 @@ public class ProjectProcessing extends GroupOrProjectProcessing {
 				if (vals != null && !vals.isEmpty()) {
 					json.put(ATTR_TAG_LIST, vals);
 				}
-				
+
 			}
 		}
 	}
@@ -439,7 +475,7 @@ public class ProjectProcessing extends GroupOrProjectProcessing {
 		builder.setObjectClass(new ObjectClass(PROJECT_NAME));
 
 		getUIDIfExists(project, UID, builder);
-		//getNAMEIfExists(project, ATTR_NAME, builder);
+		// getNAMEIfExists(project, ATTR_NAME, builder);
 		getNAMEIfExists(project, ATTR_PATH_WITH_NAMESPACE, builder);
 
 		getIfExists(project, ATTR_PATH, String.class, builder);
@@ -469,16 +505,18 @@ public class ProjectProcessing extends GroupOrProjectProcessing {
 		getIfExists(project, ATTR_JOBS_ENABLED, Integer.class, builder);
 		getIfExists(project, ATTR_ONLY_ALLOW_MERGE_IF_ALL_DISCUSSIONS_ARE_RESOLVED, Boolean.class, builder);
 		getIfExists(project, ATTR_ONLY_ALLOW_MERGE_IF_PIPELINE_SUCCEEDS, Boolean.class, builder);
-		
+
 		getIfExistsClampedJSON(project, ATTR_NAMESPACE_ID, Integer.class.toString(), builder);
 		getIfExistsClampedJSON(project, ATTR_NAMESPACE_NAME, String.class.toString(), builder);
 		getIfExistsClampedJSON(project, ATTR_NAMESPACE_PATH, String.class.toString(), builder);
 		getIfExistsClampedJSON(project, ATTR_NAMESPACE_KIND, String.class.toString(), builder);
 		getIfExistsClampedJSON(project, ATTR_NAMESPACE_FULL_PATH, String.class.toString(), builder);
 		getIfExistsClampedJSON(project, ATTR_PERMISSIONS_GROUP_ACCESS_LEVEL, Integer.class.toString(), builder);
-		getIfExistsClampedJSON(project, ATTR_PERMISSIONS_GROUP_ACCESS_NOTIFICATION_LEVEL, Integer.class.toString(), builder);
+		getIfExistsClampedJSON(project, ATTR_PERMISSIONS_GROUP_ACCESS_NOTIFICATION_LEVEL, Integer.class.toString(),
+				builder);
 		getIfExistsClampedJSON(project, ATTR_PERMISSIONS_PROJECT_ACCESS_LEVEL, Integer.class.toString(), builder);
-		getIfExistsClampedJSON(project, ATTR_PERMISSIONS_PROJECT_ACCESS_NOTIFICATION_LEVEL, Integer.class.toString(), builder);
+		getIfExistsClampedJSON(project, ATTR_PERMISSIONS_PROJECT_ACCESS_NOTIFICATION_LEVEL, Integer.class.toString(),
+				builder);
 		getIfExistsClampedJSON(project, ATTR_OWNER_NAME, Integer.class.toString(), builder);
 		getIfExistsClampedJSON(project, ATTR_OWNER_USERNAME, Integer.class.toString(), builder);
 		getIfExistsClampedJSON(project, ATTR_OWNER_ID, Integer.class.toString(), builder);
@@ -490,11 +528,10 @@ public class ProjectProcessing extends GroupOrProjectProcessing {
 		getMultiIfExists(project, ATTR_SHARED_WITH_GROUPS, builder);
 
 		addAttr(builder, ATTR_AVATAR, avatarPhoto);
-		
 
 		return builder;
 	}
-	
+
 	public void executeQueryForProject(Filter query, ResultsHandler handler, OperationOptions options) {
 		if (query instanceof EqualsFilter) {
 
@@ -506,8 +543,7 @@ public class ProjectProcessing extends GroupOrProjectProcessing {
 				}
 				StringBuilder sbPath = new StringBuilder();
 				sbPath.append(PROJECTS).append("/").append(uid.getUidValue());
-				JSONObject project = (JSONObject) executeGetRequest(sbPath.toString(), null,
-						options, false);
+				JSONObject project = (JSONObject) executeGetRequest(sbPath.toString(), null, options, false);
 				processingObjectFromGET(project, handler, sbPath.toString());
 
 			} else if (((EqualsFilter) query).getAttribute().getName().equals(ATTR_VISIBILITY)) {
@@ -516,9 +552,8 @@ public class ProjectProcessing extends GroupOrProjectProcessing {
 					invalidAttributeValue(ATTR_VISIBILITY, query);
 				}
 				Map<String, String> parameters = new HashMap<String, String>();
-				parameters.put(ATTR_VISIBILITY, (String)allValues.get(0));
-				JSONArray projects = (JSONArray) executeGetRequest(PROJECTS, parameters, options,
-						true);
+				parameters.put(ATTR_VISIBILITY, (String) allValues.get(0));
+				JSONArray projects = (JSONArray) executeGetRequest(PROJECTS, parameters, options, true);
 				processingObjectFromGET(projects, handler);
 			} else {
 				StringBuilder sb = new StringBuilder();
@@ -540,8 +575,7 @@ public class ProjectProcessing extends GroupOrProjectProcessing {
 				}
 				Map<String, String> parameters = new HashMap<String, String>();
 				parameters.put(SEARCH, allValues.get(0).toString());
-				JSONArray projects = (JSONArray) executeGetRequest(PROJECTS, parameters, options,
-						true);
+				JSONArray projects = (JSONArray) executeGetRequest(PROJECTS, parameters, options, true);
 				processingObjectFromGET(projects, handler);
 
 			} else {
@@ -552,11 +586,10 @@ public class ProjectProcessing extends GroupOrProjectProcessing {
 				throw new InvalidAttributeValueException(sb.toString());
 			}
 		} else if (query instanceof ContainsAllValuesFilter) {
-
-			if (((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_GUEST_MEMBERS) ||
-					((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_REPORTER_MEMBERS)||
-					((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_DEVELOPER_MEMBERS)||
-					((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_MASTER_MEMBERS)) {
+			if (((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_GUEST_MEMBERS)
+					|| ((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_REPORTER_MEMBERS)
+					|| ((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_DEVELOPER_MEMBERS)
+					|| ((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_MASTER_MEMBERS)) {
 
 				List<Object> allValues = ((ContainsAllValuesFilter) query).getAttribute().getValue();
 				if (allValues == null) {
@@ -566,76 +599,85 @@ public class ProjectProcessing extends GroupOrProjectProcessing {
 					LOGGER.error(sb.toString());
 					throw new InvalidAttributeValueException(sb.toString());
 				}
-				
-				for(Object value:allValues){
-					if(value == null){
+
+				for (Object value : allValues) {
+					if (value == null) {
 						invalidAttributeValue(((ContainsAllValuesFilter) query).getAttribute().getName(), query);
 					}
 				}
-				
-				JSONArray projects = new JSONArray();
-				JSONArray partOfProjects = new JSONArray();
-				int ii = 1;
-				do{
-					Map<String, String> parameters = new HashMap<String, String>();
-					parameters.put(PAGE, String.valueOf(ii));
-					parameters.put(PER_PAGE, "100");
-					
-					partOfProjects = (JSONArray) executeGetRequest(PROJECTS, parameters, null, true);
-					Iterator<Object> iterator = partOfProjects.iterator();
-					while(iterator.hasNext()){
-						Object project = iterator.next();
-						projects.put(project);
-					}
-					ii++;
-				} while(partOfProjects.length() == 100);
-				
-				JSONArray projectsWithMPMembers = new JSONArray();
-				
-				JSONObject project;
-				for (int i = 0; i < projects.length(); i++) {
-					project = projects.getJSONObject(i);
-					Integer countOfSameMember = 0;
-					
-					StringBuilder sbPath = new StringBuilder();
-					sbPath.append(PROJECTS).append("/").append(String.valueOf(project.get(UID)));
-					URIBuilder uribuilderMember = createRequestForMembers(sbPath.toString());
-					Map <Integer, List<String>> mapMembersProjects = getMembers(uribuilderMember);
-					List <String> membersProject = null;
-					if(((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_GUEST_MEMBERS)){
+				// Implemented the use of the "/memberships" route to optimize the query of the
+				// accesses of each user
+
+				String REGEX = "[\\[\\]]";
+				String uid = (((ContainsAllValuesFilter) query).getAttribute().getValue()).toString();
+
+				uid = uid.replaceAll(REGEX, "");
+
+				StringBuilder sbPath = new StringBuilder();
+				sbPath.append(USERS).append("/").append(uid).append("/").append(USERS_MEMBERSHIPS_URL);
+				String TYPE_MEMBERSHIPS_GROUP = "Project";
+				Map<Integer, Integer> projectByAccess = new HashMap<Integer, Integer>();
+
+				JSONArray projectWithMPMembers = new JSONArray();
+
+				Integer countOfSameMember = 0;
+
+				UserProcessing userProcessing = new UserProcessing(configuration, httpclient);
+				projectByAccess = userProcessing.getUserAccess(sbPath.toString(), TYPE_MEMBERSHIPS_GROUP);
+
+				Iterator<Integer> it = projectByAccess.keySet().iterator();
+
+				JSONObject project = new JSONObject();
+
+				while (it.hasNext()) {
+					Object projectID = it.next();
+
+					StringBuilder sbProjectPath = new StringBuilder();
+					sbProjectPath.append(PROJECTS).append("/").append(projectID);
+
+					URIBuilder uribuilderMember = createRequestForMembers(sbProjectPath.toString());
+					Map<Integer, List<String>> mapMembersProjects = getMembers(uribuilderMember);
+
+					List<String> membersProject = null;
+					if (((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_GUEST_MEMBERS)) {
 						membersProject = mapMembersProjects.get(10);
 					}
-					if(((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_REPORTER_MEMBERS)){
+					if (((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_REPORTER_MEMBERS)) {
 						membersProject = mapMembersProjects.get(20);
 					}
-					if(((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_DEVELOPER_MEMBERS)){
+					if (((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_DEVELOPER_MEMBERS)) {
 						membersProject = mapMembersProjects.get(30);
 					}
-					if(((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_MASTER_MEMBERS)){
+					if (((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_MASTER_MEMBERS)) {
 						membersProject = mapMembersProjects.get(40);
 					}
-					if(membersProject != null){
-						for(Object MPProjectMember : allValues){
-						
-							for(String projectMember : membersProject){
-								if(projectMember.equals((String)MPProjectMember)){
+					if (membersProject != null) {
+						for (Object MPProjectMember : allValues) {
+
+							for (String projectMember : membersProject) {
+								if (projectMember.equals((String) MPProjectMember)) {
 									countOfSameMember++;
 									break;
 								}
 							}
 						}
-						if(countOfSameMember == allValues.size()){
-							projectsWithMPMembers.put(project);
+						if (countOfSameMember == allValues.size()) {
+							project = findProjectByID(projectID.toString(), options);
+							projectWithMPMembers.put(project);
 						}
 					}
-					
 				}
-				
-				processingObjectFromGET(projectsWithMPMembers, handler);
-			} else if (((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_SHARED_WITH_GROUPS_ID_MAX_GUEST) ||
-					((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_SHARED_WITH_GROUPS_ID_MAX_REPORTER)||
-					((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_SHARED_WITH_GROUPS_ID_MAX_DEVELOPER)||
-					((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_SHARED_WITH_GROUPS_ID_MAX_MASTER)) {
+				LOGGER.info("projectWithMPMembers -  members: {0}", projectWithMPMembers);
+				processingObjectFromGET(projectWithMPMembers, handler);
+
+			} else if (((ContainsAllValuesFilter) query).getAttribute().getName()
+					.equals(ATTR_SHARED_WITH_GROUPS_ID_MAX_GUEST)
+					|| ((ContainsAllValuesFilter) query).getAttribute().getName()
+							.equals(ATTR_SHARED_WITH_GROUPS_ID_MAX_REPORTER)
+					|| ((ContainsAllValuesFilter) query).getAttribute().getName()
+							.equals(ATTR_SHARED_WITH_GROUPS_ID_MAX_DEVELOPER)
+					|| ((ContainsAllValuesFilter) query).getAttribute().getName()
+							.equals(ATTR_SHARED_WITH_GROUPS_ID_MAX_MASTER)) {
 
 				List<Object> allValues = ((ContainsAllValuesFilter) query).getAttribute().getValue();
 				if (allValues == null) {
@@ -645,61 +687,60 @@ public class ProjectProcessing extends GroupOrProjectProcessing {
 					LOGGER.error(sb.toString());
 					throw new InvalidAttributeValueException(sb.toString());
 				}
-				
-				for(Object value:allValues){
-					if(value == null){
+
+				for (Object value : allValues) {
+					if (value == null) {
 						invalidAttributeValue(((ContainsAllValuesFilter) query).getAttribute().getName(), query);
 					}
 				}
-				
+
 				JSONArray projects = new JSONArray();
 				JSONArray partOfProjects = new JSONArray();
 				int iii = 1;
-				do{
+				do {
 					Map<String, String> parameters = new HashMap<String, String>();
 					parameters.put(PAGE, String.valueOf(iii));
 					parameters.put(PER_PAGE, "100");
-					
+
 					partOfProjects = (JSONArray) executeGetRequest(PROJECTS, parameters, null, true);
 					Iterator<Object> iterator = partOfProjects.iterator();
-					while(iterator.hasNext()){
+					while (iterator.hasNext()) {
 						Object project = iterator.next();
 						projects.put(project);
 					}
 					iii++;
-				} while(partOfProjects.length() == 100);
-				
-				
+				} while (partOfProjects.length() == 100);
+
 				JSONArray projectsSharedWithMPGroups = new JSONArray();
 				JSONObject project;
 				for (int i = 0; i < projects.length(); i++) {
 					project = projects.getJSONObject(i);
 					Integer countOfSameGroups = 0;
-				
+
 					if (project.has(ATTR_SHARED_WITH_GROUPS)) {
 						Object valueObject = project.get(ATTR_SHARED_WITH_GROUPS);
-						if (valueObject != null && !JSONObject.NULL.equals(valueObject) && valueObject instanceof JSONArray) {
+						if (valueObject != null && !JSONObject.NULL.equals(valueObject)
+								&& valueObject instanceof JSONArray) {
 							JSONArray objectArray = (JSONArray) valueObject;
 							for (int ii = 0; ii < objectArray.length(); ii++) {
 								if (objectArray.get(ii) instanceof JSONObject) {
 									JSONObject jsonObject = objectArray.getJSONObject(ii);
 									String groupId = String.valueOf(jsonObject.get(ATTR_GROUP_ID));
-									for(Object MPSharedWithGroup : allValues){
-										
-										if(groupId.equals((String)MPSharedWithGroup)){
+									for (Object MPSharedWithGroup : allValues) {
+
+										if (groupId.equals((String) MPSharedWithGroup)) {
 											countOfSameGroups++;
 											break;
 										}
 									}
-									if(countOfSameGroups == allValues.size()){
+									if (countOfSameGroups == allValues.size()) {
 										projectsSharedWithMPGroups.put(project);
 									}
 								}
 							}
-						} 
+						}
 					}
 				}
-				
 				processingObjectFromGET(projectsSharedWithMPGroups, handler);
 			} else {
 				StringBuilder sb = new StringBuilder();
@@ -717,17 +758,29 @@ public class ProjectProcessing extends GroupOrProjectProcessing {
 			LOGGER.error(sb.toString());
 			throw new ConnectorIOException(sb.toString());
 		}
-
 	}
-	
+
+	private JSONObject findProjectByID(String projectID, OperationOptions options) {
+		Map<String, String> parameters = new HashMap<>();
+		parameters.put("with_custom_attributes", "no");
+		StringBuilder sbPath = new StringBuilder();
+
+		sbPath.append(PROJECTS).append("/").append(projectID);
+		JSONObject project = (JSONObject) executeGetRequest(sbPath.toString(), parameters, options, false);
+		if (project.getInt(UID) == Integer.parseInt(projectID)) {
+			return project;
+		}
+		return null;
+	}
+
 	private void addAttributeForSharedProjects(JSONObject object, ConnectorObjectBuilder builder) {
-		
+
 		List<String> guestSharedWithGroup = new ArrayList<>();
 		List<String> reporterSharedWithGroup = new ArrayList<>();
 		List<String> developerSharedWithGroup = new ArrayList<>();
 		List<String> masterSharedWithGroup = new ArrayList<>();
 		List<String> sharedWithGroupWithName = new ArrayList<>();
-		
+
 		if (object.has(ATTR_SHARED_WITH_GROUPS)) {
 			Object valueObject = object.get(ATTR_SHARED_WITH_GROUPS);
 			if (valueObject != null && !JSONObject.NULL.equals(valueObject)) {
@@ -738,42 +791,44 @@ public class ProjectProcessing extends GroupOrProjectProcessing {
 							JSONObject jsonObject = objectArray.getJSONObject(i);
 							String groupId = String.valueOf(jsonObject.get(ATTR_GROUP_ID));
 							String groupName = String.valueOf(jsonObject.get(ATTR_GROUP_NAME));
-							int access_level = (int)jsonObject.get(ATTR_GROUP_ACCESS_LEVEL);
-							
-							if(access_level == 10){
+							int access_level = (int) jsonObject.get(ATTR_GROUP_ACCESS_LEVEL);
+
+							if (access_level == 10) {
 								guestSharedWithGroup.add(groupId);
 							}
-							if(access_level == 20){
+							if (access_level == 20) {
 								reporterSharedWithGroup.add(groupId);
 							}
-							if(access_level == 30){
+							if (access_level == 30) {
 								developerSharedWithGroup.add(groupId);
 							}
-							if(access_level == 40){
+							if (access_level == 40) {
 								masterSharedWithGroup.add(groupId);
 							}
 							StringBuilder sb = new StringBuilder();
 							sb.append(groupName).append(":").append(access_level);
 							sharedWithGroupWithName.add(sb.toString());
-						} 
+						}
 					}
-					
-					if(!guestSharedWithGroup.isEmpty()){
+
+					if (!guestSharedWithGroup.isEmpty()) {
 						builder.addAttribute(ATTR_SHARED_WITH_GROUPS_ID_MAX_GUEST, guestSharedWithGroup.toArray());
 					}
-					if(!reporterSharedWithGroup.isEmpty()){
-						builder.addAttribute(ATTR_SHARED_WITH_GROUPS_ID_MAX_REPORTER, reporterSharedWithGroup.toArray());
+					if (!reporterSharedWithGroup.isEmpty()) {
+						builder.addAttribute(ATTR_SHARED_WITH_GROUPS_ID_MAX_REPORTER,
+								reporterSharedWithGroup.toArray());
 					}
-					if(!developerSharedWithGroup.isEmpty()){
-						builder.addAttribute(ATTR_SHARED_WITH_GROUPS_ID_MAX_DEVELOPER, developerSharedWithGroup.toArray());
+					if (!developerSharedWithGroup.isEmpty()) {
+						builder.addAttribute(ATTR_SHARED_WITH_GROUPS_ID_MAX_DEVELOPER,
+								developerSharedWithGroup.toArray());
 					}
-					if(!masterSharedWithGroup.isEmpty()){
+					if (!masterSharedWithGroup.isEmpty()) {
 						builder.addAttribute(ATTR_SHARED_WITH_GROUPS_ID_MAX_MASTER, masterSharedWithGroup.toArray());
 					}
-					if(!sharedWithGroupWithName.isEmpty()){
+					if (!sharedWithGroupWithName.isEmpty()) {
 						builder.addAttribute(ATTR_SHARED_WITH_GROUPS_WITH_NAME, sharedWithGroupWithName.toArray());
 					}
-				} 
+				}
 			}
 		}
 	}
@@ -787,7 +842,7 @@ public class ProjectProcessing extends GroupOrProjectProcessing {
 		LOGGER.info("addAtributeMembers, connectorObject: {0}", connectorObject.toString());
 		handler.handle(connectorObject);
 	}
-	
+
 	private void processingObjectFromGET(JSONArray projects, ResultsHandler handler) {
 		JSONObject project;
 		for (int i = 0; i < projects.length(); i++) {
@@ -797,39 +852,38 @@ public class ProjectProcessing extends GroupOrProjectProcessing {
 			processingObjectFromGET(project, handler, sbPath.toString());
 		}
 	}
-	
+
 	public void updateDeltaMultiValues(Uid uid, Set<AttributeDelta> attributesDelta, OperationOptions options) {
 		updateDeltaMultiValuesForGroupOrProject(uid, attributesDelta, options, PROJECTS);
 		for (AttributeDelta attrDelta : attributesDelta) {
 
-			if (ATTR_SHARED_WITH_GROUPS_ID_MAX_GUEST.equals(attrDelta.getName())) {  
+			if (ATTR_SHARED_WITH_GROUPS_ID_MAX_GUEST.equals(attrDelta.getName())) {
 				createOrDeleteSharingWithGroup(uid, attrDelta, 10);
 			}
-			if (ATTR_SHARED_WITH_GROUPS_ID_MAX_REPORTER.equals(attrDelta.getName())) {  
+			if (ATTR_SHARED_WITH_GROUPS_ID_MAX_REPORTER.equals(attrDelta.getName())) {
 				createOrDeleteSharingWithGroup(uid, attrDelta, 20);
 			}
-			if (ATTR_SHARED_WITH_GROUPS_ID_MAX_DEVELOPER.equals(attrDelta.getName())) {  
+			if (ATTR_SHARED_WITH_GROUPS_ID_MAX_DEVELOPER.equals(attrDelta.getName())) {
 				createOrDeleteSharingWithGroup(uid, attrDelta, 30);
 			}
-			if (ATTR_SHARED_WITH_GROUPS_ID_MAX_MASTER.equals(attrDelta.getName())) {  
+			if (ATTR_SHARED_WITH_GROUPS_ID_MAX_MASTER.equals(attrDelta.getName())) {
 				createOrDeleteSharingWithGroup(uid, attrDelta, 40);
 			}
-			if (ATTR_TAG_LIST.equals(attrDelta.getName())) {  
+			if (ATTR_TAG_LIST.equals(attrDelta.getName())) {
 				createOrDeleteTagList(uid, attrDelta);
 			}
 		}
 	}
-	
-	private void createOrDeleteTagList(Uid uid, AttributeDelta attrDelta){
+
+	private void createOrDeleteTagList(Uid uid, AttributeDelta attrDelta) {
 		StringBuilder sbPath = new StringBuilder();
 		sbPath.append(PROJECTS).append("/").append(uid.getUidValue());
-			
-		JSONObject project = (JSONObject) executeGetRequest(sbPath.toString(), null,
-				null, false);
-		
+
+		JSONObject project = (JSONObject) executeGetRequest(sbPath.toString(), null, null, false);
+
 		JSONArray jsonArrayTagList = (JSONArray) project.get(ATTR_TAG_LIST);
-		List<Object> tagList = jsonArrayTagList.toList(); 
-		
+		List<Object> tagList = jsonArrayTagList.toList();
+
 		List<Object> addValues = attrDelta.getValuesToAdd();
 		List<Object> removeValues = attrDelta.getValuesToRemove();
 		if (addValues != null && !addValues.isEmpty()) {
@@ -837,7 +891,7 @@ public class ProjectProcessing extends GroupOrProjectProcessing {
 			for (Object addValue : addValues) {
 				if (addValue != null && !tagList.contains(addValue)) {
 					tagList.add(addValue);
-					
+
 				}
 			}
 		}
@@ -845,7 +899,7 @@ public class ProjectProcessing extends GroupOrProjectProcessing {
 			for (Object removeValue : removeValues) {
 				if (removeValue != null && tagList.contains(removeValue)) {
 					tagList.remove(removeValue);
-					
+
 				}
 			}
 		}
@@ -856,11 +910,11 @@ public class ProjectProcessing extends GroupOrProjectProcessing {
 		LOGGER.info("json: {0}", json.toString());
 		createPutOrPostRequest(uid, PROJECTS, json, create);
 	}
-	
-	private void createOrDeleteSharingWithGroup(Uid uid, AttributeDelta attrDelta, int accessLevel){
+
+	private void createOrDeleteSharingWithGroup(Uid uid, AttributeDelta attrDelta, int accessLevel) {
 		StringBuilder sbPath = new StringBuilder();
 		sbPath.append(PROJECTS).append("/").append(uid.getUidValue()).append(SHARE);
-			
+
 		List<Object> addValues = attrDelta.getValuesToAdd();
 		List<Object> removeValues = attrDelta.getValuesToRemove();
 		if (addValues != null && !addValues.isEmpty()) {

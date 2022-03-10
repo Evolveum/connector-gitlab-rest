@@ -75,6 +75,7 @@ public class ObjectProcessing {
 	private static final String HTTP_PROTOCOL = "http";
 
 	protected static final String USERS = "/users";
+	protected static final String USERS_MEMBERSHIPS_URL = "memberships";
 	protected static final String GROUPS = "/groups";
 	protected static final String PROJECTS = "/projects";
 	protected static final String MEMBERS = "/members";
@@ -90,9 +91,9 @@ public class ObjectProcessing {
 	protected static final String PAGE = "page";
 	protected static final String PER_PAGE = "per_page";
 	protected static final String PROJECT_NAME = "Project";
-        
-        protected static final String UPLOAD_URL = "/uploads/-/";
-        protected static final String PROTOCOL_APPENDER = "://";        
+
+	protected static final String UPLOAD_URL = "/uploads/-/";
+	protected static final String PROTOCOL_APPENDER = "://";
 
 	protected static final String ATTR_NAME = "name";
 	protected static final String ATTR_WEB_URL = "web_url";
@@ -105,8 +106,8 @@ public class ObjectProcessing {
 	private URIBuilder uriBuilder;
 	protected CloseableHttpClient httpclient;
 
-	private GitlabRestConfiguration configuration;
-	
+	protected GitlabRestConfiguration configuration;
+
 	public long firstStartTime;
 	public long firstEndTime;
 	public long secondStartTime;
@@ -116,18 +117,18 @@ public class ObjectProcessing {
 	public long firstDuration;
 	public long secondDuration;
 	public long thirdDuration;
-	
+
 	public ObjectProcessing(GitlabRestConfiguration configuration, CloseableHttpClient httpclient) {
 		this.configuration = configuration;
 		this.httpclient = httpclient;
 
 		StringBuilder sbHost = new StringBuilder();
 		sbHost.append(this.configuration.getLoginURL()).append(HOST_POSTFIX_API);
-                // Add https support
-                String protocol=HTTP_PROTOCOL;
-                if(this.configuration.getProtocol()!=null && !this.configuration.getProtocol().isEmpty()){
-                protocol=this.configuration.getProtocol();
-                }
+		// Add https support
+		String protocol = HTTP_PROTOCOL;
+		if (this.configuration.getProtocol() != null && !this.configuration.getProtocol().isEmpty()) {
+			protocol = this.configuration.getProtocol();
+		}
 		this.uriBuilder = new URIBuilder().setScheme(protocol).setHost(sbHost.toString());
 	}
 
@@ -365,10 +366,11 @@ public class ObjectProcessing {
 		}
 		return new Uid(stringId);
 	}
-	
+
 	protected void putAttrIfExists(Set<Attribute> attributes, String attrNameFromMP, Class<?> type, JSONObject json) {
 
-		LOGGER.info("PutAttrIfExists attributes: {0}, attrNameFromMP: {1}, type {2}, json: {3}", attributes.toString(), attrNameFromMP, type, json.toString());
+		LOGGER.info("PutAttrIfExists attributes: {0}, attrNameFromMP: {1}, type {2}, json: {3}", attributes.toString(),
+				attrNameFromMP, type, json.toString());
 
 		// put optional attribute
 
@@ -376,7 +378,7 @@ public class ObjectProcessing {
 			String valueAttr = getAttr(attributes, attrNameFromMP, String.class, null);
 			if (valueAttr != null) {
 				json.put(attrNameFromMP, valueAttr);
-			} 
+			}
 		} else if (type.equals(Integer.class)) {
 			Integer valueAttr = getAttr(attributes, attrNameFromMP, Integer.class, null);
 			if (valueAttr != null) {
@@ -389,13 +391,12 @@ public class ObjectProcessing {
 			}
 		}
 	}
-	
-	
 
 	protected void putAttrIfExists(Set<Attribute> attributes, String attrNameFromMP, Class<?> type, JSONObject json,
 			String attrNameToGitlab) {
 
-		LOGGER.info("PutAttrIfExists attributes: {0}, attrNameFromMP: {1}, type {2}, json: {3}, attrNameToGitlab: {4}", attributes.toString(), attrNameFromMP, type, json.toString(), attrNameToGitlab);
+		LOGGER.info("PutAttrIfExists attributes: {0}, attrNameFromMP: {1}, type {2}, json: {3}, attrNameToGitlab: {4}",
+				attributes.toString(), attrNameFromMP, type, json.toString(), attrNameToGitlab);
 
 		if (attrNameToGitlab == null) {
 			attrNameToGitlab = attrNameFromMP;
@@ -407,7 +408,7 @@ public class ObjectProcessing {
 			String valueAttr = getAttr(attributes, attrNameFromMP, String.class, null);
 			if (valueAttr != null) {
 				json.put(attrNameToGitlab, valueAttr);
-			} 
+			}
 		} else if (type.equals(Integer.class)) {
 			Integer valueAttr = getAttr(attributes, attrNameFromMP, Integer.class, null);
 			if (valueAttr != null) {
@@ -420,16 +421,18 @@ public class ObjectProcessing {
 			}
 		}
 	}
-	
+
 	protected void putRequestedAttrIfExists(Boolean create, Set<Attribute> attributes, String attrNameFromMP,
 			JSONObject json) {
 		putRequestedAttrIfExists(create, attributes, attrNameFromMP, json, null);
 	}
 
 	protected void putRequestedAttrIfExists(Boolean create, Set<Attribute> attributes, String attrNameFromMP,
-											JSONObject json, String attrNameToGitlab) {
+			JSONObject json, String attrNameToGitlab) {
 
-		LOGGER.info("putRequestedAttrIfExists create {0}, attributes: {1}, attrNameFromMP: {2} json: {3}, attrNameToGitlab: {4}", create.toString(), attributes.toString(), attrNameFromMP, json.toString(), attrNameToGitlab);
+		LOGGER.info(
+				"putRequestedAttrIfExists create {0}, attributes: {1}, attrNameFromMP: {2} json: {3}, attrNameToGitlab: {4}",
+				create.toString(), attributes.toString(), attrNameFromMP, json.toString(), attrNameToGitlab);
 
 		if (attrNameToGitlab == null) {
 			attrNameToGitlab = attrNameFromMP;
@@ -472,18 +475,20 @@ public class ObjectProcessing {
 		}
 	}
 
-	protected Object executeGetRequest(String path, Map<String, String> parameters, OperationOptions options, Boolean resultIsArray) {
-		LOGGER.info("executeGetRequest path {0}, parameters: {1}, options: {2}, result is array: {3}", path, parameters, options, resultIsArray);
+	protected Object executeGetRequest(String path, Map<String, String> parameters, OperationOptions options,
+			Boolean resultIsArray) {
+		LOGGER.info("executeGetRequest path {0}, parameters: {1}, options: {2}, result is array: {3}", path, parameters,
+				options, resultIsArray);
 		URIBuilder uribuilder = getURIBuilder();
 		uribuilder.clearParameters();
-                 int totalPages;		
+		int totalPages;
 		uribuilder.setPath(path);
 		if (options != null) {
 			Integer page = options.getPagedResultsOffset();
 			Integer perPage = options.getPageSize();
 			if (page != null) {
 				uribuilder.addParameter(PAGE, page.toString());
-			}                        
+			}
 			if (perPage != null) {
 				uribuilder.addParameter(PER_PAGE, perPage.toString());
 			}
@@ -496,40 +501,40 @@ public class ObjectProcessing {
 			}
 		}
 
-            try {
-                URI uri = uribuilder.build();
-                HttpRequestBase request = new HttpGet(uri);
-                //Get X-Total-Pages
-                HttpRequestBase totalPagesrequest = new HttpGet(uri);
-                totalPages = getTotalPages(totalPagesrequest);
+		try {
+			URI uri = uribuilder.build();
+			HttpRequestBase request = new HttpGet(uri);
+			// Get X-Total-Pages
+			HttpRequestBase totalPagesrequest = new HttpGet(uri);
+			totalPages = getTotalPages(totalPagesrequest);
 
-                if (resultIsArray) {
-                    if (totalPages == 1) {
-                        return callRequestForJSONArray(request, true);
-                    } else {
-                        JSONArray responce = new JSONArray();
-                        if (options == null || options.getPageSize() == null) {
-                            uribuilder.addParameter(PER_PAGE, "100");
-                        }
-                        for (int i = 0; i < totalPages; i++) {
-                            URI uriPaged = uribuilder.setParameter(PAGE, Integer.toString(i)).build();
-                            HttpRequestBase requestPaged = new HttpGet(uriPaged);
-                            JSONArray responcePaged = callRequestForJSONArray(requestPaged, true);
-                            responce = mergeJSONArrays(responce, responcePaged);
-                        }
-                        return responce;
+			if (resultIsArray) {
+				if (totalPages == 1) {
+					return callRequestForJSONArray(request, true);
+				} else {
+					JSONArray responce = new JSONArray();
+					if (options == null || options.getPageSize() == null) {
+						uribuilder.addParameter(PER_PAGE, "100");
+					}
+					for (int i = 0; i < totalPages; i++) {
+						URI uriPaged = uribuilder.setParameter(PAGE, Integer.toString(i)).build();
+						HttpRequestBase requestPaged = new HttpGet(uriPaged);
+						JSONArray responcePaged = callRequestForJSONArray(requestPaged, true);
+						responce = mergeJSONArrays(responce, responcePaged);
+					}
+					return responce;
 
-                    }
-                } else {
-                    return callRequest(request, true);
-                }
-            } catch (URISyntaxException e) {
-                StringBuilder sb = new StringBuilder();
-                sb.append("It was not possible create URI from UriBuider:").append(uriBuilder).append(";")
-                        .append(e.getLocalizedMessage());
-                throw new ConnectorException(sb.toString(), e);
-            }
-    }
+				}
+			} else {
+				return callRequest(request, true);
+			}
+		} catch (URISyntaxException e) {
+			StringBuilder sb = new StringBuilder();
+			sb.append("It was not possible create URI from UriBuider:").append(uriBuilder).append(";")
+					.append(e.getLocalizedMessage());
+			throw new ConnectorException(sb.toString(), e);
+		}
+	}
 
 	protected int getUIDIfExists(JSONObject object, String nameAttr, ConnectorObjectBuilder builder) {
 		if (object.has(nameAttr)) {
@@ -543,7 +548,7 @@ public class ObjectProcessing {
 			throw new InvalidAttributeValueException(sb.toString());
 		}
 	}
-	
+
 	protected int getUIDIfExists(JSONObject object, String nameAttr) {
 		if (object.has(nameAttr)) {
 			int uid = object.getInt(nameAttr);
@@ -575,28 +580,27 @@ public class ObjectProcessing {
 
 	protected byte[] getAvatarPhoto(JSONObject object, String attrURLName, String attrName) {
 
-
 		if (this.configuration.getObjectAvatar().equals("false")) {
 			return null;
 		}
-		
+
 		if (object.has(attrURLName) && object.get(attrURLName) != null
 				&& !JSONObject.NULL.equals(object.get(attrURLName))) {
 
 			HttpEntity responseEntity = null;
 			CloseableHttpResponse response = null;
 			try {
-                            
-                            String attrURLValue = "";
-                            if (String.valueOf(object.get(attrURLName)).startsWith(UPLOAD_URL)) {
-                                attrURLValue = this.configuration.getProtocol() + PROTOCOL_APPENDER + this.configuration.getLoginURL() + String.valueOf(object.get(attrURLName));
-                            } else {
-                                attrURLValue = String.valueOf(object.get(attrURLName));
-                            }
-                            URIBuilder uriPhoto = new URIBuilder(attrURLValue);
-                            URI uri = uriPhoto.build();
 
-                            
+				String attrURLValue = "";
+				if (String.valueOf(object.get(attrURLName)).startsWith(UPLOAD_URL)) {
+					attrURLValue = this.configuration.getProtocol() + PROTOCOL_APPENDER
+							+ this.configuration.getLoginURL() + String.valueOf(object.get(attrURLName));
+				} else {
+					attrURLValue = String.valueOf(object.get(attrURLName));
+				}
+				URIBuilder uriPhoto = new URIBuilder(attrURLValue);
+				URI uri = uriPhoto.build();
+
 				LOGGER.ok("uri: {0}", uri);
 				HttpRequestBase request = new HttpGet(uri);
 
@@ -618,35 +622,37 @@ public class ObjectProcessing {
 				// execute request
 				response = execute(request);
 				LOGGER.info("responsePhoto: {0}", response);
-				
+
 			} catch (URISyntaxException e) {
 				StringBuilder sb = new StringBuilder();
 				sb.append("It was not possible create URI from UriBuider; ").append(e.getLocalizedMessage());
 				throw new ConnectorException(sb.toString(), e);
 			}
-				
-				processResponseErrors(response);
-				responseEntity = response.getEntity();
-				
-			try{
-				
+
+			processResponseErrors(response);
+			responseEntity = response.getEntity();
+
+			try {
+
 				byte[] byteJPEG = EntityUtils.toByteArray(responseEntity);
 				responseClose(response);
 				return byteJPEG;
-				
+
 			} catch (IOException e) {
 				StringBuilder sb = new StringBuilder();
-				sb.append("It was not possible create byte[] from response entity: ").append(responseEntity).append("; ").append(e.getLocalizedMessage());
+				sb.append("It was not possible create byte[] from response entity: ").append(responseEntity)
+						.append("; ").append(e.getLocalizedMessage());
 				responseClose(response);
 				throw new ConnectorException(sb.toString(), e);
-			} 
+			}
 		}
 		return null;
 
 	}
 
 	protected void getIfExists(JSONObject object, String attrName, Class<?> type, ConnectorObjectBuilder builder) {
-		if (object.has(attrName) && object.get(attrName) != null && !JSONObject.NULL.equals(object.get(attrName)) && !String.valueOf(object.get(attrName)).isEmpty()) {
+		if (object.has(attrName) && object.get(attrName) != null && !JSONObject.NULL.equals(object.get(attrName))
+				&& !String.valueOf(object.get(attrName)).isEmpty()) {
 			if (type.equals(String.class)) {
 				addAttr(builder, attrName, String.valueOf(object.get(attrName)));
 			} else {
@@ -654,9 +660,11 @@ public class ObjectProcessing {
 			}
 		}
 	}
-	
-	protected void getIfExists(JSONObject object, String attrName, Class<?> type, ConnectorObjectBuilder builder, String MPName) {
-		if (object.has(attrName) && object.get(attrName) != null && !JSONObject.NULL.equals(object.get(attrName)) && !String.valueOf(object.get(attrName)).isEmpty()) {
+
+	protected void getIfExists(JSONObject object, String attrName, Class<?> type, ConnectorObjectBuilder builder,
+			String MPName) {
+		if (object.has(attrName) && object.get(attrName) != null && !JSONObject.NULL.equals(object.get(attrName))
+				&& !String.valueOf(object.get(attrName)).isEmpty()) {
 			if (type.equals(String.class)) {
 				addAttr(builder, MPName, String.valueOf(object.get(attrName)));
 			} else {
@@ -664,25 +672,31 @@ public class ObjectProcessing {
 			}
 		}
 	}
-	
-	protected void getIfExistsClampedJSON(JSONObject object, String attrName, String type, ConnectorObjectBuilder builder) {
+
+	protected void getIfExistsClampedJSON(JSONObject object, String attrName, String type,
+			ConnectorObjectBuilder builder) {
 		String fullName = attrName;
 		JSONObject processingObject = object;
-		while(fullName.contains(".")){
+		while (fullName.contains(".")) {
 			String partsName[] = fullName.split("[.]");
 			String basicAttrName = partsName[0];
-			if (processingObject.has(basicAttrName) && processingObject.get(basicAttrName) != null && !JSONObject.NULL.equals(processingObject.get(basicAttrName)) && !String.valueOf(processingObject.get(basicAttrName)).isEmpty()) {
+			if (processingObject.has(basicAttrName) && processingObject.get(basicAttrName) != null
+					&& !JSONObject.NULL.equals(processingObject.get(basicAttrName))
+					&& !String.valueOf(processingObject.get(basicAttrName)).isEmpty()) {
 				StringBuilder sb = new StringBuilder();
-				for(int i=1;i<partsName.length;i++){
+				for (int i = 1; i < partsName.length; i++) {
 					sb.append(partsName[i]);
-					if(i+1!=partsName.length){
-					sb.append(".");
+					if (i + 1 != partsName.length) {
+						sb.append(".");
 					}
 				}
 				String clampedAttrName = sb.toString();
 				JSONObject clampedObject = new JSONObject(String.valueOf(processingObject.get(basicAttrName)));
-				
-				if (!clampedAttrName.contains(".") && clampedObject.has(clampedAttrName) && clampedObject.get(clampedAttrName) != null && !JSONObject.NULL.equals(clampedObject.get(clampedAttrName)) && !String.valueOf(clampedObject.get(clampedAttrName)).isEmpty()) {
+
+				if (!clampedAttrName.contains(".") && clampedObject.has(clampedAttrName)
+						&& clampedObject.get(clampedAttrName) != null
+						&& !JSONObject.NULL.equals(clampedObject.get(clampedAttrName))
+						&& !String.valueOf(clampedObject.get(clampedAttrName)).isEmpty()) {
 					if (type.equals(String.class.toString())) {
 						addAttr(builder, attrName, String.valueOf(clampedObject.get(clampedAttrName)));
 					} else {
@@ -765,8 +779,8 @@ public class ObjectProcessing {
 
 	protected <T> T addAttr(ConnectorObjectBuilder builder, String attrName, T attrVal) {
 		if (attrVal != null) {
-			if(attrVal instanceof String){
-				String unescapeAttrVal = StringEscapeUtils.unescapeXml((String)attrVal);
+			if (attrVal instanceof String) {
+				String unescapeAttrVal = StringEscapeUtils.unescapeXml((String) attrVal);
 				builder.addAttribute(attrName, unescapeAttrVal);
 			} else {
 				builder.addAttribute(attrName, attrVal);
@@ -822,7 +836,7 @@ public class ObjectProcessing {
 		} else if (statusCode == 409) {
 			responseClose(response);
 			throw new AlreadyExistsException(message);
-		} 
+		}
 		// other codes
 		responseClose(response);
 		throw new ConnectorException(message);
@@ -838,45 +852,45 @@ public class ObjectProcessing {
 		}
 	}
 
-    private int getTotalPages(HttpRequestBase request) {
-        LOGGER.info("request X-Total-Pages: {0}", request.getURI());
-        int totalPages;
+	private int getTotalPages(HttpRequestBase request) {
+		LOGGER.info("request X-Total-Pages: {0}", request.getURI());
+		int totalPages;
 
-        final StringBuilder privateToken = new StringBuilder();
-        if (this.configuration.getPrivateToken() != null) {
-            Accessor accessor = new GuardedString.Accessor() {
-                @Override
-                public void access(char[] chars) {
-                    privateToken.append(new String(chars));
-                }
-            };
-            this.configuration.getPrivateToken().access(accessor);
-        }
-        request.addHeader("PRIVATE-TOKEN", privateToken.toString());
-        request.addHeader("Content-Type", "application/json; charset=utf-8");
+		final StringBuilder privateToken = new StringBuilder();
+		if (this.configuration.getPrivateToken() != null) {
+			Accessor accessor = new GuardedString.Accessor() {
+				@Override
+				public void access(char[] chars) {
+					privateToken.append(new String(chars));
+				}
+			};
+			this.configuration.getPrivateToken().access(accessor);
+		}
+		request.addHeader("PRIVATE-TOKEN", privateToken.toString());
+		request.addHeader("Content-Type", "application/json; charset=utf-8");
 
-        // execute request
-        CloseableHttpResponse response = execute(request);
-        Header responseHeaderTotalPage = response.getFirstHeader("X-Total-Pages");        
-        if (responseHeaderTotalPage != null) {
-            totalPages = Integer.parseInt(responseHeaderTotalPage.getValue());
-        } else {
-            totalPages = 1;
-        }
-        LOGGER.info("X-Total-Pages: {0}", totalPages);
-        responseClose(response);
-        return totalPages;
-    }
+		// execute request
+		CloseableHttpResponse response = execute(request);
+		Header responseHeaderTotalPage = response.getFirstHeader("X-Total-Pages");
+		if (responseHeaderTotalPage != null) {
+			totalPages = Integer.parseInt(responseHeaderTotalPage.getValue());
+		} else {
+			totalPages = 1;
+		}
+		LOGGER.info("X-Total-Pages: {0}", totalPages);
+		responseClose(response);
+		return totalPages;
+	}
 
-    private JSONArray mergeJSONArrays(JSONArray rootArr, JSONArray addArr) {
+	private JSONArray mergeJSONArrays(JSONArray rootArr, JSONArray addArr) {
 
-        JSONArray sourceArray = new JSONArray(rootArr.toString());
-        JSONArray destinationArray = new JSONArray(addArr.toString());
+		JSONArray sourceArray = new JSONArray(rootArr.toString());
+		JSONArray destinationArray = new JSONArray(addArr.toString());
 
-        for (int i = 0; i < sourceArray.length(); i++) {
-            destinationArray.put(sourceArray.getJSONObject(i));
-        }
-        return destinationArray;
-    }
+		for (int i = 0; i < sourceArray.length(); i++) {
+			destinationArray.put(sourceArray.getJSONObject(i));
+		}
+		return destinationArray;
+	}
 
 }

@@ -64,13 +64,14 @@ public class GroupOrProjectProcessing extends ObjectProcessing {
 		super(configuration, httpclient);
 	}
 
-	//return map with access lever, that represent integer, and list of user's id (access lever "0" represent name of each members with their access level)
-	protected Map <Integer, List<String>> getMembers(URIBuilder uribuilderMember) {
-		
+	// return map with access lever, that represent integer, and list of user's id
+	// (access lever "0" represent name of each members with their access level)
+	protected Map<Integer, List<String>> getMembers(URIBuilder uribuilderMember) {
+		LOGGER.info("MAP getMembers Start");
 		JSONArray objectsMember = new JSONArray();
 		JSONArray partOfObjectsMember = new JSONArray();
 		int ii = 1;
-		do{
+		do {
 			URI uriMember;
 			try {
 				uribuilderMember.clearParameters();
@@ -80,48 +81,48 @@ public class GroupOrProjectProcessing extends ObjectProcessing {
 			} catch (URISyntaxException e) {
 				StringBuilder sb = new StringBuilder();
 				sb.append("It was not possible create URI from UriBuider:").append(uribuilderMember).append(";")
-					.append(e.getLocalizedMessage());
+						.append(e.getLocalizedMessage());
 				LOGGER.error(sb.toString());
 				throw new ConnectorException(sb.toString(), e);
 			}
-		
+
 			HttpRequestBase requestMember = new HttpGet(uriMember);
-		
+
 			partOfObjectsMember = callRequestForJSONArray(requestMember, true);
 			Iterator<Object> iterator = partOfObjectsMember.iterator();
-			while(iterator.hasNext()){
+			while (iterator.hasNext()) {
 				Object member = iterator.next();
 				objectsMember.put(member);
 			}
 			ii++;
-		} while(partOfObjectsMember.length() == 100);
-		
+		} while (partOfObjectsMember.length() == 100);
+
 		List<String> guestMembers = new ArrayList<>();
 		List<String> reporterMembers = new ArrayList<>();
 		List<String> developerMembers = new ArrayList<>();
 		List<String> masterMembers = new ArrayList<>();
 		List<String> ownerMembers = new ArrayList<>();
 		List<String> membersWithName = new ArrayList<>();
-		Map <Integer, List<String>> members = new HashMap<Integer, List<String>>();
+		Map<Integer, List<String>> members = new HashMap<Integer, List<String>>();
 		for (int i = 0; i < objectsMember.length(); i++) {
 			JSONObject jsonObjectMember = objectsMember.getJSONObject(i);
 			String userId = String.valueOf(jsonObjectMember.get(UID));
 			String userName = String.valueOf(jsonObjectMember.get(ATTR_USERNAME));
 			String expiresDate = String.valueOf(jsonObjectMember.get(ATTR_EXPIRES_AT));
-			int access_level = (int)jsonObjectMember.get(ATTR_ACCESS_LEVEL);
-			if(access_level == 10){
+			int access_level = (int) jsonObjectMember.get(ATTR_ACCESS_LEVEL);
+			if (access_level == 10) {
 				guestMembers.add(userId);
 			}
-			if(access_level == 20){
+			if (access_level == 20) {
 				reporterMembers.add(userId);
 			}
-			if(access_level == 30){
+			if (access_level == 30) {
 				developerMembers.add(userId);
 			}
-			if(access_level == 40){
+			if (access_level == 40) {
 				masterMembers.add(userId);
 			}
-			if(access_level == 50){
+			if (access_level == 50) {
 				ownerMembers.add(userId);
 			}
 			StringBuilder sb = new StringBuilder();
@@ -134,76 +135,78 @@ public class GroupOrProjectProcessing extends ObjectProcessing {
 		members.put(30, developerMembers);
 		members.put(40, masterMembers);
 		members.put(50, ownerMembers);
+		LOGGER.info("MAP getMembers End");
+		LOGGER.info("MAP getMembers -  members: {0}", members);
 		return members;
 	}
 
-	
-	protected URIBuilder createRequestForMembers(String path){
+	protected URIBuilder createRequestForMembers(String path) {
 		URIBuilder uribuilderMember = getURIBuilder();
 		StringBuilder sbPath = new StringBuilder();
 		sbPath.append(path).append(MEMBERS);
 		uribuilderMember.setPath(sbPath.toString());
 		return uribuilderMember;
 	}
-	
+
 	protected void addAttributeForMembers(ConnectorObjectBuilder builder, ResultsHandler handler, String path) {
 		URIBuilder uribuilderMember = createRequestForMembers(path);
-		Map <Integer, List<String>> members = getMembers(uribuilderMember);
-		
-		if(!members.get(10).isEmpty()){
+		Map<Integer, List<String>> members = getMembers(uribuilderMember);
+
+		if (!members.get(10).isEmpty()) {
 			builder.addAttribute(ATTR_GUEST_MEMBERS, members.get(10).toArray());
 		}
-		if(!members.get(20).isEmpty()){
+		if (!members.get(20).isEmpty()) {
 			builder.addAttribute(ATTR_REPORTER_MEMBERS, members.get(20).toArray());
 		}
-		if(!members.get(30).isEmpty()){
+		if (!members.get(30).isEmpty()) {
 			builder.addAttribute(ATTR_DEVELOPER_MEMBERS, members.get(30).toArray());
 		}
-		if(!members.get(40).isEmpty()){
+		if (!members.get(40).isEmpty()) {
 			builder.addAttribute(ATTR_MASTER_MEMBERS, members.get(40).toArray());
 		}
-		if(!members.get(50).isEmpty()){
+		if (!members.get(50).isEmpty()) {
 			builder.addAttribute(ATTR_OWNER_MEMBERS, members.get(50).toArray());
 		}
-		if(!members.get(0).isEmpty()){
+		if (!members.get(0).isEmpty()) {
 			builder.addAttribute(ATTR_MEMBERS_WITH_NAME, members.get(0).toArray());
 		}
 	}
 
-	public void updateDeltaMultiValuesForGroupOrProject(Uid uid, Set<AttributeDelta> attributesDelta, OperationOptions options,
-			String path) {
-		
-		LOGGER.info("updateDeltaMultiValuesForGroupOrProject on uid: {0}, attrDelta: {1}, options: {2}", uid.getValue(), attributesDelta, options);
-		
+	public void updateDeltaMultiValuesForGroupOrProject(Uid uid, Set<AttributeDelta> attributesDelta,
+			OperationOptions options, String path) {
+
+		LOGGER.info("updateDeltaMultiValuesForGroupOrProject on uid: {0}, attrDelta: {1}, options: {2}", uid.getValue(),
+				attributesDelta, options);
+
 		for (AttributeDelta attrDelta : attributesDelta) {
 
-			if (ATTR_GUEST_MEMBERS.equals(attrDelta.getName())) {  
+			if (ATTR_GUEST_MEMBERS.equals(attrDelta.getName())) {
 				createOrDeleteMember(uid, attrDelta, path, 10);
-				
+
 			}
-			if (ATTR_REPORTER_MEMBERS.equals(attrDelta.getName())) {  
+			if (ATTR_REPORTER_MEMBERS.equals(attrDelta.getName())) {
 				createOrDeleteMember(uid, attrDelta, path, 20);
-				
+
 			}
-			if (ATTR_DEVELOPER_MEMBERS.equals(attrDelta.getName())) {  
+			if (ATTR_DEVELOPER_MEMBERS.equals(attrDelta.getName())) {
 				createOrDeleteMember(uid, attrDelta, path, 30);
-				
+
 			}
-			if (ATTR_MASTER_MEMBERS.equals(attrDelta.getName())) {  
+			if (ATTR_MASTER_MEMBERS.equals(attrDelta.getName())) {
 				createOrDeleteMember(uid, attrDelta, path, 40);
-				
+
 			}
-			if (ATTR_OWNER_MEMBERS.equals(attrDelta.getName())) { 
+			if (ATTR_OWNER_MEMBERS.equals(attrDelta.getName())) {
 				createOrDeleteMember(uid, attrDelta, path, 50);
-				
+
 			}
 		}
 	}
-	private void createOrDeleteMember(Uid uid, AttributeDelta attrDelta,
-		String path, int accessLevel){
+
+	private void createOrDeleteMember(Uid uid, AttributeDelta attrDelta, String path, int accessLevel) {
 		StringBuilder sbPath = new StringBuilder();
 		sbPath.append(path).append("/").append(uid.getUidValue()).append(MEMBERS);
-		
+
 		List<Object> addValues = attrDelta.getValuesToAdd();
 		List<Object> removeValues = attrDelta.getValuesToRemove();
 		if (addValues != null && !addValues.isEmpty()) {
