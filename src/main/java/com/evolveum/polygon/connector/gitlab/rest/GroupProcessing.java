@@ -58,7 +58,7 @@ public class GroupProcessing extends GroupOrProjectProcessing {
 	private static final String ATTR_PARENT_ID = "parent_id";
 	private static final String ATTR_FULL_NAME = "full_name";
 	private static final String ATTR_FULL_PATH = "full_path";
-	
+
 	public GroupProcessing(GitlabRestConfiguration configuration, CloseableHttpClient httpclient) {
 		super(configuration, httpclient);
 	}
@@ -70,7 +70,8 @@ public class GroupProcessing extends GroupOrProjectProcessing {
 
 		// required
 		// ATTR_NAME and ATTR_PATH are required for creating groups
-		// However, we don't define ATTR_PATH as createable and updateable because we handle it from the value of ATTR_FULL_PATH which is
+		// However, we don't define ATTR_PATH as createable and updateable because we
+		// handle it from the value of ATTR_FULL_PATH which is
 		// defined as secondary identifier (__NAME__)
 		AttributeInfoBuilder attrNameBuilder = new AttributeInfoBuilder(ATTR_NAME);
 		attrNameBuilder.setRequired(true).setType(String.class).setCreateable(true).setUpdateable(true)
@@ -78,7 +79,7 @@ public class GroupProcessing extends GroupOrProjectProcessing {
 		groupObjClassBuilder.addAttributeInfo(attrNameBuilder.build());
 
 		// optional
-		//createable: FALSE && updateable: FALSE && readable: TRUE
+		// createable: FALSE && updateable: FALSE && readable: TRUE
 		AttributeInfoBuilder attrPathBuilder = new AttributeInfoBuilder(ATTR_PATH);
 		attrPathBuilder.setRequired(true).setType(String.class).setCreateable(false).setUpdateable(false)
 				.setReadable(true);
@@ -87,88 +88,98 @@ public class GroupProcessing extends GroupOrProjectProcessing {
 		AttributeInfoBuilder attrAvatarUrlBuilder = new AttributeInfoBuilder(ATTR_AVATAR_URL);
 		attrAvatarUrlBuilder.setType(String.class).setCreateable(false).setUpdateable(false).setReadable(true);
 		groupObjClassBuilder.addAttributeInfo(attrAvatarUrlBuilder.build());
-		
+
 		AttributeInfoBuilder attrFullNameBuilder = new AttributeInfoBuilder(ATTR_FULL_NAME);
 		attrFullNameBuilder.setType(String.class).setCreateable(false).setUpdateable(false).setReadable(true);
 		groupObjClassBuilder.addAttributeInfo(attrFullNameBuilder.build());
-		
+
 		AttributeInfoBuilder attrFullPathBuilder = new AttributeInfoBuilder(ATTR_FULL_PATH);
 		attrFullPathBuilder.setType(String.class).setCreateable(false).setUpdateable(false).setReadable(true);
 		groupObjClassBuilder.addAttributeInfo(attrFullPathBuilder.build());
-		
+
 		AttributeInfoBuilder avatarBuilder = new AttributeInfoBuilder(ATTR_AVATAR);
 		avatarBuilder.setType(byte[].class).setCreateable(false).setUpdateable(false).setReadable(true);
 		groupObjClassBuilder.addAttributeInfo(avatarBuilder.build());
-		
+
 		AttributeInfoBuilder attrRequestAccessEnabledBuilder = new AttributeInfoBuilder(ATTR_REQUEST_ACCESS_ENABLED);
-		attrRequestAccessEnabledBuilder.setType(Boolean.class).setCreateable(false).setUpdateable(false).setReadable(true);
+		attrRequestAccessEnabledBuilder.setType(Boolean.class).setCreateable(false).setUpdateable(false)
+				.setReadable(true);
 		groupObjClassBuilder.addAttributeInfo(attrRequestAccessEnabledBuilder.build());
-		
+
 		AttributeInfoBuilder attrWebUrlBuilder = new AttributeInfoBuilder(ATTR_WEB_URL);
 		attrWebUrlBuilder.setType(String.class).setCreateable(false).setUpdateable(false).setReadable(true);
 		groupObjClassBuilder.addAttributeInfo(attrWebUrlBuilder.build());
-		
-		//createable: TRUE && updateable: TRUE && readable: TRUE
+
+		// createable: TRUE && updateable: TRUE && readable: TRUE
 		AttributeInfoBuilder attrDescriptionBuilder = new AttributeInfoBuilder(ATTR_DESCRIPTION);
 		attrDescriptionBuilder.setType(String.class).setCreateable(true).setUpdateable(true).setReadable(true);
 		groupObjClassBuilder.addAttributeInfo(attrDescriptionBuilder.build());
-		
+
 		// attr visibility can be private, internal, or public
 		AttributeInfoBuilder attrVisibilityBuilder = new AttributeInfoBuilder(ATTR_VISIBILITY);
 		attrVisibilityBuilder.setType(String.class).setCreateable(true).setUpdateable(true).setReadable(true);
 		groupObjClassBuilder.addAttributeInfo(attrVisibilityBuilder.build());
-		
+
 		AttributeInfoBuilder attrLfsEnabledBuilder = new AttributeInfoBuilder(ATTR_LFS_ENABLED);
 		attrLfsEnabledBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(true).setReadable(true);
 		groupObjClassBuilder.addAttributeInfo(attrLfsEnabledBuilder.build());
-		
-		//createable: TRUE && updateable: TRUE && readable: FALSE
+
+		// createable: TRUE && updateable: TRUE && readable: FALSE
 		AttributeInfoBuilder attrMembershipLockBuilder = new AttributeInfoBuilder(ATTR_MEMBERSHIP_LOCK);
-		attrMembershipLockBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(true).setReadable(false).setReturnedByDefault(false);
+		attrMembershipLockBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(true).setReadable(false)
+				.setReturnedByDefault(false);
 		groupObjClassBuilder.addAttributeInfo(attrMembershipLockBuilder.build());
-		
+
 		AttributeInfoBuilder attrShareWithGroupLockBuilder = new AttributeInfoBuilder(ATTR_SHARE_WITH_GROUP_LOCK);
 		attrShareWithGroupLockBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(true).setReadable(true);
 		groupObjClassBuilder.addAttributeInfo(attrShareWithGroupLockBuilder.build());
-		
+
 		AttributeInfoBuilder attrParentIdBuilder = new AttributeInfoBuilder(ATTR_PARENT_ID);
 		attrParentIdBuilder.setType(Integer.class).setCreateable(true).setUpdateable(true).setReadable(true);
 		groupObjClassBuilder.addAttributeInfo(attrParentIdBuilder.build());
-		
-		//multivalued: TRUE && createable: FALSE && updateable: FALSE && readable: TRUE
+
+		// multivalued: TRUE && createable: FALSE && updateable: FALSE && readable: TRUE
 		AttributeInfoBuilder attrProjectsBuilder = new AttributeInfoBuilder(ATTR_PROJECTS);
-		attrProjectsBuilder.setType(String.class).setMultiValued(true).setCreateable(false).setUpdateable(false).setReadable(true);
+		attrProjectsBuilder.setType(String.class).setMultiValued(true).setCreateable(false).setUpdateable(false)
+				.setReadable(true);
 		groupObjClassBuilder.addAttributeInfo(attrProjectsBuilder.build());
-		
+
 		AttributeInfoBuilder attrSharedProjectsBuilder = new AttributeInfoBuilder(ATTR_SHARED_PROJECTS);
-		attrSharedProjectsBuilder.setType(String.class).setMultiValued(true).setCreateable(false).setUpdateable(false).setReadable(true);
+		attrSharedProjectsBuilder.setType(String.class).setMultiValued(true).setCreateable(false).setUpdateable(false)
+				.setReadable(true);
 		groupObjClassBuilder.addAttributeInfo(attrSharedProjectsBuilder.build());
-		
+
 		AttributeInfoBuilder attrMembersBuilder = new AttributeInfoBuilder(ATTR_MEMBERS_WITH_NAME);
-		attrMembersBuilder.setType(String.class).setMultiValued(true).setCreateable(false).setUpdateable(false).setReadable(true);
+		attrMembersBuilder.setType(String.class).setMultiValued(true).setCreateable(false).setUpdateable(false)
+				.setReadable(true);
 		groupObjClassBuilder.addAttributeInfo(attrMembersBuilder.build());
-		
-		//multivalued: TRUE && createable: TRUE && updateable: TRUE && readable: TRUE
+
+		// multivalued: TRUE && createable: TRUE && updateable: TRUE && readable: TRUE
 		AttributeInfoBuilder attrGuestMembersBuilder = new AttributeInfoBuilder(ATTR_GUEST_MEMBERS);
-		attrGuestMembersBuilder.setType(String.class).setMultiValued(true).setCreateable(true).setUpdateable(true).setReadable(true);
+		attrGuestMembersBuilder.setType(String.class).setMultiValued(true).setCreateable(true).setUpdateable(true)
+				.setReadable(true);
 		groupObjClassBuilder.addAttributeInfo(attrGuestMembersBuilder.build());
-		
+
 		AttributeInfoBuilder attrReporterMembersBuilder = new AttributeInfoBuilder(ATTR_REPORTER_MEMBERS);
-		attrReporterMembersBuilder.setType(String.class).setMultiValued(true).setCreateable(true).setUpdateable(true).setReadable(true);
+		attrReporterMembersBuilder.setType(String.class).setMultiValued(true).setCreateable(true).setUpdateable(true)
+				.setReadable(true);
 		groupObjClassBuilder.addAttributeInfo(attrReporterMembersBuilder.build());
-		
+
 		AttributeInfoBuilder attrDeveloperMembersBuilder = new AttributeInfoBuilder(ATTR_DEVELOPER_MEMBERS);
-		attrDeveloperMembersBuilder.setType(String.class).setMultiValued(true).setCreateable(true).setUpdateable(true).setReadable(true);
+		attrDeveloperMembersBuilder.setType(String.class).setMultiValued(true).setCreateable(true).setUpdateable(true)
+				.setReadable(true);
 		groupObjClassBuilder.addAttributeInfo(attrDeveloperMembersBuilder.build());
-		
+
 		AttributeInfoBuilder attrMasterMembersBuilder = new AttributeInfoBuilder(ATTR_MASTER_MEMBERS);
-		attrMasterMembersBuilder.setType(String.class).setMultiValued(true).setCreateable(true).setUpdateable(true).setReadable(true);
+		attrMasterMembersBuilder.setType(String.class).setMultiValued(true).setCreateable(true).setUpdateable(true)
+				.setReadable(true);
 		groupObjClassBuilder.addAttributeInfo(attrMasterMembersBuilder.build());
-		
+
 		AttributeInfoBuilder attrOwnerMembersBuilder = new AttributeInfoBuilder(ATTR_OWNER_MEMBERS);
-		attrOwnerMembersBuilder.setType(String.class).setMultiValued(true).setCreateable(true).setUpdateable(true).setReadable(true);
+		attrOwnerMembersBuilder.setType(String.class).setMultiValued(true).setCreateable(true).setUpdateable(true)
+				.setReadable(true);
 		groupObjClassBuilder.addAttributeInfo(attrOwnerMembersBuilder.build());
-		
+
 		schemaBuilder.defineObjectClass(groupObjClassBuilder.build());
 	}
 
@@ -207,7 +218,7 @@ public class GroupProcessing extends GroupOrProjectProcessing {
 
 				JSONObject parent = findGroupByFullPath(parentFullPath, operationOptions);
 				if (parent != null) {
-				    json.put(ATTR_PARENT_ID, parent.getInt(UID));
+					json.put(ATTR_PARENT_ID, parent.getInt(UID));
 				}
 			}
 		}
@@ -251,21 +262,16 @@ public class GroupProcessing extends GroupOrProjectProcessing {
 
 	public void executeQueryForGroup(Filter query, ResultsHandler handler, OperationOptions options) {
 		if (query instanceof EqualsFilter) {
-
 			if (((EqualsFilter) query).getAttribute() instanceof Uid) {
-
 				Uid uid = (Uid) ((EqualsFilter) query).getAttribute();
 				if (uid.getUidValue() == null) {
 					invalidAttributeValue("Uid", query);
 				}
 				StringBuilder sbPath = new StringBuilder();
 				sbPath.append(GROUPS).append("/").append(uid.getUidValue());
-				JSONObject group = (JSONObject) executeGetRequest(sbPath.toString(), null,
-						options, false);
+				JSONObject group = (JSONObject) executeGetRequest(sbPath.toString(), null, options, false);
 				processingObjectFromGET(group, handler, sbPath.toString());
-
-			}  else if (((EqualsFilter) query).getAttribute() instanceof Name) {
-
+			} else if (((EqualsFilter) query).getAttribute() instanceof Name) {
 				Name name = (Name) ((EqualsFilter) query).getAttribute();
 				if (name.getNameValue() == null) {
 					invalidAttributeValue("Name", query);
@@ -276,7 +282,6 @@ public class GroupProcessing extends GroupOrProjectProcessing {
 					sbPath.append(GROUPS).append("/").append(group.getInt(UID));
 					processingObjectFromGET(group, handler, sbPath.toString());
 				}
-
 			} else {
 				StringBuilder sb = new StringBuilder();
 				sb.append("Illegal search with attribute ").append(((EqualsFilter) query).getAttribute().getName())
@@ -284,9 +289,7 @@ public class GroupProcessing extends GroupOrProjectProcessing {
 				LOGGER.error(sb.toString());
 				throw new InvalidAttributeValueException(sb.toString());
 			}
-
 		} else if (query instanceof ContainsFilter) {
-
 			if (((ContainsFilter) query).getAttribute().getName().equals("__NAME__")
 					|| ((ContainsFilter) query).getAttribute().getName().equals(ATTR_PATH)) {
 
@@ -306,85 +309,86 @@ public class GroupProcessing extends GroupOrProjectProcessing {
 				throw new InvalidAttributeValueException(sb.toString());
 			}
 		} else if (query instanceof ContainsAllValuesFilter) {
-
-			if (((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_GUEST_MEMBERS) ||
-					((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_REPORTER_MEMBERS)||
-					((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_DEVELOPER_MEMBERS)||
-					((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_MASTER_MEMBERS)||
-					((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_OWNER_MEMBERS)) {
+			// Implemented the use of the "/memberships" route to optimize the query of the
+			// accesses of each user
+			if (((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_GUEST_MEMBERS)
+					|| ((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_REPORTER_MEMBERS)
+					|| ((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_DEVELOPER_MEMBERS)
+					|| ((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_MASTER_MEMBERS)
+					|| ((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_OWNER_MEMBERS)) {
 
 				List<Object> allValues = ((ContainsAllValuesFilter) query).getAttribute().getValue();
 				if (allValues == null) {
-					
+
 				}
-				
-				for(Object value:allValues){
-					if(value == null){
+
+				for (Object value : allValues) {
+					if (value == null) {
 						invalidAttributeValue(((ContainsAllValuesFilter) query).getAttribute().getName(), query);
 					}
 				}
-				
-				JSONArray groups = new JSONArray();
-				JSONArray partOfGroups = new JSONArray();
-				int ii = 1;
-				do{
-					Map<String, String> parameters = new HashMap<String, String>();
-					parameters.put(PAGE, String.valueOf(ii));
-					parameters.put(PER_PAGE, "100");
-					
-					partOfGroups = (JSONArray) executeGetRequest(GROUPS, parameters, null, true);
-					Iterator<Object> iterator = partOfGroups.iterator();
-					while(iterator.hasNext()){
-						Object group = iterator.next();
-						groups.put(group);
-					}
-					ii++;
-				} while(partOfGroups.length() == 100);
-				
+
+				String REGEX = "[\\[\\]]";
+				String uid = (((ContainsAllValuesFilter) query).getAttribute().getValue()).toString();
+
+				uid = uid.replaceAll(REGEX, "");
+
+				StringBuilder sbPath = new StringBuilder();
+				sbPath.append(USERS).append("/").append(uid).append("/").append(USERS_MEMBERSHIPS_URL);
+
+				String TYPE_MEMBERSHIPS_GROUP = "Namespace";
+				Map<Integer, Integer> groupByAccess = new HashMap<Integer, Integer>();
 				JSONArray groupsWithMPMembers = new JSONArray();
-				
-				JSONObject group;
-				for (int i = 0; i < groups.length(); i++) {
-					group = groups.getJSONObject(i);
-					Integer countOfSameMember = 0;
-					
-					StringBuilder sbPath = new StringBuilder();
-					sbPath.append(GROUPS).append("/").append(String.valueOf(group.get(UID)));
-					URIBuilder uribuilderMember = createRequestForMembers(sbPath.toString());
-					Map <Integer, List<String>> mapMembersGroup = getMembers(uribuilderMember);
-					List <String> membersGroup = null;
-					if(((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_GUEST_MEMBERS)){
+				Integer countOfSameMember = 0;
+
+				UserProcessing userProcessing = new UserProcessing(configuration, httpclient);
+				groupByAccess = userProcessing.getUserAccess(sbPath.toString(), TYPE_MEMBERSHIPS_GROUP);
+
+				Iterator<Integer> it = groupByAccess.keySet().iterator();
+
+				JSONObject group = new JSONObject();
+
+				while (it.hasNext()) {
+					Object groupID = it.next();
+
+					StringBuilder sbGroupPath = new StringBuilder();
+					sbGroupPath.append(GROUPS).append("/").append(groupID);
+
+					URIBuilder uribuilderMember = createRequestForMembers(sbGroupPath.toString());
+					Map<Integer, List<String>> mapMembersGroup = getMembers(uribuilderMember);
+
+					List<String> membersGroup = null;
+					if (((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_GUEST_MEMBERS)) {
 						membersGroup = mapMembersGroup.get(10);
 					}
-					if(((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_REPORTER_MEMBERS)){
+					if (((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_REPORTER_MEMBERS)) {
 						membersGroup = mapMembersGroup.get(20);
 					}
-					if(((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_DEVELOPER_MEMBERS)){
+					if (((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_DEVELOPER_MEMBERS)) {
 						membersGroup = mapMembersGroup.get(30);
 					}
-					if(((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_MASTER_MEMBERS)){
+					if (((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_MASTER_MEMBERS)) {
 						membersGroup = mapMembersGroup.get(40);
 					}
-					if(((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_OWNER_MEMBERS)){
+					if (((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_OWNER_MEMBERS)) {
 						membersGroup = mapMembersGroup.get(50);
 					}
-					if(membersGroup != null){
-						for(Object MPGroupMember : allValues){
-						
-							for(String groupMember : membersGroup){
-								if(groupMember.equals((String)MPGroupMember)){
+					if (membersGroup != null) {
+						for (Object MPGroupMember : allValues) {
+							for (String groupMember : membersGroup) {
+								if (groupMember.equals((String) MPGroupMember)) {
 									countOfSameMember++;
 									break;
 								}
 							}
 						}
-						if(countOfSameMember == allValues.size()){
+						if (countOfSameMember == allValues.size()) {
+							group = findGroupByID(groupID.toString(), options);
 							groupsWithMPMembers.put(group);
 						}
 					}
-					
 				}
-				
+				LOGGER.info("groupsWithMPMembers -  members: {0}", groupsWithMPMembers);
 				processingObjectFromGET(groupsWithMPMembers, handler);
 			} else {
 				StringBuilder sb = new StringBuilder();
@@ -418,13 +422,26 @@ public class GroupProcessing extends GroupOrProjectProcessing {
 		}
 		return null;
 	}
-	
+
+	private JSONObject findGroupByID(String groupID, OperationOptions options) {
+		Map<String, String> parameters = new HashMap<>();
+		parameters.put("with_custom_attributes", "no");
+		parameters.put("with_projects", "no");
+		StringBuilder sbPath = new StringBuilder();
+
+		sbPath.append(GROUPS).append("/").append(groupID);
+		JSONObject group = (JSONObject) executeGetRequest(sbPath.toString(), parameters, options, false);
+		if (group.getInt(UID) == Integer.parseInt(groupID)) {
+			return group;
+		}
+		return null;
+	}
+
 	private void processingObjectFromGET(JSONObject group, ResultsHandler handler, String sbPath) {
 		byte[] avaratPhoto = getAvatarPhoto(group, ATTR_AVATAR_URL, ATTR_AVATAR);
 		ConnectorObjectBuilder builder = convertGroupJSONObjectToConnectorObject(group, avaratPhoto);
 		addAttributeForMembers(builder, handler, sbPath);
 		ConnectorObject connectorObject = builder.build();
-		LOGGER.info("addAtributeMembers, connectorObject: {0}", connectorObject.toString());
 		handler.handle(connectorObject);
 	}
 
@@ -437,8 +454,9 @@ public class GroupProcessing extends GroupOrProjectProcessing {
 			processingObjectFromGET(group, handler, sbPath.toString());
 		}
 	}
-	
+
 	public void updateDeltaMultiValues(Uid uid, Set<AttributeDelta> attributes, OperationOptions options) {
 		updateDeltaMultiValuesForGroupOrProject(uid, attributes, options, GROUPS);
 	}
+
 }
