@@ -331,7 +331,10 @@ public class UserProcessing extends ObjectProcessing {
 		putAttrIfExists(attributes, ATTR_IS_ADMIN, Boolean.class, json, ATTR_ADMIN);
 		putAttrIfExists(attributes, ATTR_CAN_CREATE_GROUP, Boolean.class, json);
 		putAttrIfExists(attributes, ATTR_EXTERNAL, Boolean.class, json);
-		putAttrIfExists(attributes, ATTR_CONFIRM, Boolean.class, json);
+
+		if (create) {
+			putAttrIfExists(attributes, ATTR_CONFIRM, Boolean.class, json);
+		}
 
 		if (!create) {
 			putAttrIfExists(attributes, ATTR_RECONFIRM, Boolean.class, json);
