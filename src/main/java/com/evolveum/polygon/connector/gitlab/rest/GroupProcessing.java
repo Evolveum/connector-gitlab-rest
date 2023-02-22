@@ -339,7 +339,6 @@ public class GroupProcessing extends GroupOrProjectProcessing {
 				String TYPE_MEMBERSHIPS_GROUP = "Namespace";
 				Map<Integer, Integer> groupByAccess = new HashMap<Integer, Integer>();
 				JSONArray groupsWithMPMembers = new JSONArray();
-				Integer countOfSameMember = 0;
 
 				UserProcessing userProcessing = new UserProcessing(configuration, httpclient);
 				groupByAccess = userProcessing.getUserAccess(sbPath.toString(), TYPE_MEMBERSHIPS_GROUP);
@@ -349,6 +348,7 @@ public class GroupProcessing extends GroupOrProjectProcessing {
 				JSONObject group = new JSONObject();
 
 				while (it.hasNext()) {
+					Integer countOfSameMember = 0;
 					Object groupID = it.next();
 
 					StringBuilder sbGroupPath = new StringBuilder();
