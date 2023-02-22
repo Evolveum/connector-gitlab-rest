@@ -190,9 +190,7 @@ public class UserProcessing extends ObjectProcessing {
 		userObjClassBuilder.addAttributeInfo(attrLinkedinBuilder.build());
 
 		AttributeInfoBuilder attrIsAdminBuilder = new AttributeInfoBuilder(ATTR_IS_ADMIN);
-//		attrIsAdminBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(true).setReadable(true);
-		attrIsAdminBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(true).setReadable(false)
-				.setReturnedByDefault(false);
+		attrIsAdminBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(true).setReadable(true);
 		userObjClassBuilder.addAttributeInfo(attrIsAdminBuilder.build());
 
 		// createable: TRUE && updateable: FALSE && readable: FALSE
@@ -532,6 +530,7 @@ public class UserProcessing extends ObjectProcessing {
 		getIfExists(user, ATTR_TWO_FACTOR_ENABLED, Boolean.class, builder);
 		getIfExists(user, ATTR_EXTERNAL, Boolean.class, builder);
 		getIfExists(user, ATTR_AVATAR_URL, String.class, builder);
+		getIfExists(user, ATTR_IS_ADMIN, Boolean.class, builder);
 
 		if (user.has(ATTR_STATE)) {
 			boolean enable = STATUS_ACTIVE.equals(user.get(ATTR_STATE).toString());
