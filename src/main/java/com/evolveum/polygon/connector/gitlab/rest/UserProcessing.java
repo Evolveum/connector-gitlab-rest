@@ -120,6 +120,7 @@ public class UserProcessing extends ObjectProcessing {
 	protected static final String ATTR_USER_MEMBERSHIPS_SRC_ID = "source_id";
 	protected static final String ATTR_USER_MEMBERSHIPS_ACCESS_LEVEL = "access_level";
 	protected static final String ATTR_USER_MEMBERSHIPS_SRC_TYPE = "source_type";
+	protected static final String ATTR_USER_MEMBERSHIPS_SRC_NAME = "source_name";
 
 	protected CloseableHttpClient httpclient;
 	private GitlabRestConfiguration configuration;
@@ -797,7 +798,7 @@ public class UserProcessing extends ObjectProcessing {
 			if (groupsToManage == null) {
 				groupsOrProjects.put(groupOrProject);
 			} else if (groupsToManage
-					.containsKey(new JSONObject(groupOrProject.toString()).getString("name").toLowerCase())) {
+					.containsKey(new JSONObject(groupOrProject.toString()).getString(ATTR_USER_MEMBERSHIPS_SRC_NAME).toLowerCase())) {
 				groupsOrProjects.put(groupOrProject);
 			}
 		}
