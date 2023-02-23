@@ -1,0 +1,28 @@
+name: Publish package to GitHub Packages
+on:
+  push:
+    tags:
+      - "v*.*.*"
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          java-version: '8'
+          distribution: 'adopt'
+          cache: 'maven'
+      - name: Update version in pom.xml
+        run: mvn -B versions:set -DnewVersion=${{ github.ref_name }} -DgenerateBackupPoms=false
+      - name: mvn package
+        run: mvn --batch-mode package -Dmaven.test.skip=true
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: target/*.jar
+          prerelease: true
+          fail_on_unmatched_files: true
