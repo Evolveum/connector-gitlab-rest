@@ -57,6 +57,11 @@ public class GroupOrProjectProcessing extends ObjectProcessing {
 	protected static final String ATTR_DEVELOPER_MEMBERS = "developer_members";
 	protected static final String ATTR_MASTER_MEMBERS = "master_members";
 	protected static final String ATTR_OWNER_MEMBERS = "owner_members";
+	protected static final String ATTR_GUEST_MEMBERS_FULLPATH = "guest_members";
+	protected static final String ATTR_REPORTER_MEMBERS_FULLPATH = "reporter_members_fullpath";
+	protected static final String ATTR_DEVELOPER_MEMBERS_FULLPATH = "developer_members_fullpath";
+	protected static final String ATTR_MASTER_MEMBERS_FULLPATH = "master_members_fullpath";
+	protected static final String ATTR_OWNER_MEMBERS_FULLPATH = "owner_members_fullpath";
 	protected static final String ATTR_MEMBERS_WITH_NAME = "members_with_name";
 	protected static final String ATTR_EXPIRES_AT = "expires_at";
 
@@ -136,6 +141,81 @@ public class GroupOrProjectProcessing extends ObjectProcessing {
 		members.put(40, masterMembers);
 		members.put(50, ownerMembers);
 		LOGGER.info("MAP getMembers End");
+		LOGGER.info("MAP getMembers -  members: {0}", members);
+		return members;
+	}
+	
+	
+	protected Map<Integer, List<String>> getMembersUserRoute(URIBuilder uribuilderMember) {
+		LOGGER.info("MAP getMembersUserRoute Start");
+		JSONArray objectsMember = new JSONArray();
+		JSONArray partOfObjectsMember = new JSONArray();
+		int ii = 1;
+		do {
+			URI uriMember;
+			try {
+				uribuilderMember.clearParameters();
+				uribuilderMember.addParameter(PAGE, String.valueOf(ii));
+				uribuilderMember.addParameter(PER_PAGE, "100");
+				uriMember = uribuilderMember.build();
+			} catch (URISyntaxException e) {
+				StringBuilder sb = new StringBuilder();
+				sb.append("It was not possible create URI from UriBuider:").append(uribuilderMember).append(";")
+						.append(e.getLocalizedMessage());
+				LOGGER.error(sb.toString());
+				throw new ConnectorException(sb.toString(), e);
+			}
+
+			HttpRequestBase requestMember = new HttpGet(uriMember);
+
+			partOfObjectsMember = callRequestForJSONArray(requestMember, true);
+			Iterator<Object> iterator = partOfObjectsMember.iterator();
+			while (iterator.hasNext()) {
+				Object member = iterator.next();
+				objectsMember.put(member);
+			}
+			ii++;
+		} while (partOfObjectsMember.length() == 100);
+
+		List<String> guestMembers = new ArrayList<>();
+		List<String> reporterMembers = new ArrayList<>();
+		List<String> developerMembers = new ArrayList<>();
+		List<String> masterMembers = new ArrayList<>();
+		List<String> ownerMembers = new ArrayList<>();
+		List<String> membersWithName = new ArrayList<>();
+		Map<Integer, List<String>> members = new HashMap<Integer, List<String>>();
+		for (int i = 0; i < objectsMember.length(); i++) {
+			JSONObject jsonObjectMember = objectsMember.getJSONObject(i);
+			String userId = String.valueOf(jsonObjectMember.get(UID));
+			String userName = String.valueOf(jsonObjectMember.get(ATTR_USERNAME));
+			String expiresDate = String.valueOf(jsonObjectMember.get(ATTR_EXPIRES_AT));
+			int access_level = (int) jsonObjectMember.get(ATTR_ACCESS_LEVEL);
+			if (access_level == 10) {
+				guestMembers.add(userId);
+			}
+			if (access_level == 20) {
+				reporterMembers.add(userId);
+			}
+			if (access_level == 30) {
+				developerMembers.add(userId);
+			}
+			if (access_level == 40) {
+				masterMembers.add(userId);
+			}
+			if (access_level == 50) {
+				ownerMembers.add(userId);
+			}
+			StringBuilder sb = new StringBuilder();
+			sb.append(userName).append(":").append(access_level).append(":").append(expiresDate);
+			membersWithName.add(sb.toString());
+		}
+		members.put(0, membersWithName);
+		members.put(10, guestMembers);
+		members.put(20, reporterMembers);
+		members.put(30, developerMembers);
+		members.put(40, masterMembers);
+		members.put(50, ownerMembers);
+		LOGGER.info("MAP getMembersUserRoute End");
 		LOGGER.info("MAP getMembers -  members: {0}", members);
 		return members;
 	}

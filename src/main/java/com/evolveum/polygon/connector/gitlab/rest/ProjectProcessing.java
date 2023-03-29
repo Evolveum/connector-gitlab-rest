@@ -103,7 +103,8 @@ public class ProjectProcessing extends GroupOrProjectProcessing {
 	private static final String ATTR_SHARED_WITH_GROUPS_WITH_NAME = "shared_with_groups.name-access_level";
 
 	private static final String ATTR_GROUP_ID = "group_id";
-	private static final String ATTR_GROUP_NAME = "group_name";
+	//private static final String ATTR_GROUP_NAME = "group_name";
+	private static final String ATTR_GROUP_FULL_PATH = "group_full_path";
 	private static final String ATTR_GROUP_ACCESS_LEVEL = "group_access_level";
 	private static final String ATTR_GROUP_ACCESS = "group_access";
 
@@ -697,7 +698,7 @@ public class ProjectProcessing extends GroupOrProjectProcessing {
 				JSONArray projects = new JSONArray();
 				JSONArray partOfProjects = new JSONArray();
 				int iii = 1;
-				do {
+
 					Map<String, String> parameters = new HashMap<String, String>();
 					parameters.put(PAGE, String.valueOf(iii));
 					parameters.put(PER_PAGE, "100");
@@ -708,8 +709,9 @@ public class ProjectProcessing extends GroupOrProjectProcessing {
 						Object project = iterator.next();
 						projects.put(project);
 					}
-					iii++;
-				} while (partOfProjects.length() == 100);
+					LOGGER.info("Value of PAGE : {0}", iii);
+					LOGGER.info("Value of ParfOfProjects Lenght : {0}", partOfProjects.length());
+					LOGGER.info("Value of Projects Lenght : {0}", projects.length());
 
 				JSONArray projectsSharedWithMPGroups = new JSONArray();
 				JSONObject project;
@@ -790,7 +792,8 @@ public class ProjectProcessing extends GroupOrProjectProcessing {
 						if (objectArray.get(i) instanceof JSONObject) {
 							JSONObject jsonObject = objectArray.getJSONObject(i);
 							String groupId = String.valueOf(jsonObject.get(ATTR_GROUP_ID));
-							String groupName = String.valueOf(jsonObject.get(ATTR_GROUP_NAME));
+							//String groupName = String.valueOf(jsonObject.get(ATTR_GROUP_NAME));
+							String groupFullPath = String.valueOf(jsonObject.get(ATTR_GROUP_FULL_PATH));
 							int access_level = (int) jsonObject.get(ATTR_GROUP_ACCESS_LEVEL);
 
 							if (access_level == 10) {
@@ -806,7 +809,7 @@ public class ProjectProcessing extends GroupOrProjectProcessing {
 								masterSharedWithGroup.add(groupId);
 							}
 							StringBuilder sb = new StringBuilder();
-							sb.append(groupName).append(":").append(access_level);
+							sb.append(groupFullPath).append(":").append(access_level);
 							sharedWithGroupWithName.add(sb.toString());
 						}
 					}

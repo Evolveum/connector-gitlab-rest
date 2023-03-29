@@ -814,6 +814,43 @@ public class UserProcessing extends ObjectProcessing {
 		LOGGER.info("getUserAccess End");
 		return output;
 	}
+	
+	// A ideia dessa função é ter um atalho para mapear os acessos dos usuários de forma que possamos utiliza-la como atalho nas buscas
+	// e além da velocidade resolver o problema de associação.
+	public Map<Integer, Integer> getMemberOf(String sbPath, String type) {
+		LOGGER.info("getUserAccess Start");
+		// Get groups or project to manage is informed by user on connector configuration
+		Map<String, String> groupsToManage = getGroupsForFilter(this.configuration.getGroupsToManage());
+		Map<Integer, Integer> output = new HashMap<Integer, Integer>();
+		JSONArray groupsOrProjects = new JSONArray();
+		JSONArray partOfGroupsOrProjects = new JSONArray();
+		Map<String, String> parameters = new HashMap<String, String>();
+
+		parameters.put(PER_PAGE, "100");
+		parameters.put(TYPE_MEMBERSHIPS, type);
+
+		// Get all groups or projects for user
+		partOfGroupsOrProjects = (JSONArray) executeGetRequest(sbPath, parameters, null, true);
+		Iterator<Object> iterator = partOfGroupsOrProjects.iterator();
+		while (iterator.hasNext()) {
+			Object groupOrProject = iterator.next();
+			if (groupsToManage == null) {
+				groupsOrProjects.put(groupOrProject);
+			} else if (groupsToManage
+					.containsKey(new JSONObject(groupOrProject.toString()).getString("name").toLowerCase())) {
+				groupsOrProjects.put(groupOrProject);
+			}
+		}
+		for (int i = 0; i < groupsOrProjects.length(); i++) {
+			JSONObject jsonGroupOrProject = groupsOrProjects.getJSONObject(i);
+			int sourceID = (int) (jsonGroupOrProject.get(ATTR_USER_MEMBERSHIPS_SRC_ID));
+			int accessLevel = (int) jsonGroupOrProject.get(ATTR_USER_MEMBERSHIPS_ACCESS_LEVEL);
+
+			output.put(sourceID, accessLevel);
+		}
+		LOGGER.info("getUserAccess End");
+		return output;
+	}
 
 	private Map<String, String> getGroupsForFilter(String groupsToManage) {
 		LOGGER.info("getGroupsForFilter Start");

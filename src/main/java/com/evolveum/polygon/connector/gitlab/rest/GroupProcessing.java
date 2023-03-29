@@ -60,6 +60,7 @@ public class GroupProcessing extends GroupOrProjectProcessing {
 	private static final String ATTR_FULL_NAME = "full_name";
 	private static final String ATTR_FULL_PATH = "full_path";
 
+	
 	public GroupProcessing(GitlabRestConfiguration configuration, CloseableHttpClient httpclient) {
 		super(configuration, httpclient);
 	}
@@ -252,7 +253,7 @@ public class GroupProcessing extends GroupOrProjectProcessing {
 		getIfExists(group, ATTR_PARENT_ID, Integer.class, builder);
 		getIfExists(group, ATTR_FULL_NAME, String.class, builder);
 		getIfExists(group, ATTR_FULL_PATH, String.class, builder);
-
+		
 		getMultiIfExists(group, ATTR_PROJECTS, builder);
 		getMultiIfExists(group, ATTR_SHARED_PROJECTS, builder);
 
@@ -333,6 +334,7 @@ public class GroupProcessing extends GroupOrProjectProcessing {
 				UserProcessing userProcessing = new UserProcessing(configuration, httpclient);
 				Map<Integer, Integer> groupByAccess = userProcessing.getUserAccess(USERS + "/" + uid + "/" + USERS_MEMBERSHIPS_URL, UserProcessing.TYPE_MEMBERSHIPS_GROUP);
 
+
 				for (int groupID : groupByAccess.keySet()) {
 					URIBuilder uribuilderMember = createRequestForMembers(GROUPS + "/" + groupID);
 					Map<Integer, List<String>> mapMembersGroup = getMembers(uribuilderMember);
@@ -358,6 +360,7 @@ public class GroupProcessing extends GroupOrProjectProcessing {
 						default:
 							membersGroup = null;
 							break;
+
 					}
 
 					if (membersGroup == null) {
