@@ -14,12 +14,12 @@
 	<parent>
 		<artifactId>connector-parent</artifactId>
 		<groupId>com.evolveum.polygon</groupId>
-		<version>1.4.2.18</version>
+		<version>1.5.1.3</version>
 		<relativePath></relativePath>
 	</parent>
 
 	<artifactId>connector-gitlab-rest</artifactId>
-	<version>1.2.5-SNAPSHOT</version>
+	<version>2.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>REST Connector Gitlab</name>
@@ -33,17 +33,17 @@
 		<repository>
 			<id>evolveum-nexus-releases</id>
 			<name>Internal Releases</name>
-			<url>http://nexus.evolveum.com/nexus/content/repositories/releases/</url>
+			<url>https://nexus.evolveum.com/nexus/content/repositories/releases/</url>
 		</repository>
 		<repository>
 			<id>evolveum-nexus-snapshots</id>
 			<name>Internal Releases</name>
-			<url>http://nexus.evolveum.com/nexus/content/repositories/snapshots/</url>
+			<url>https://nexus.evolveum.com/nexus/content/repositories/snapshots/</url>
 		</repository>
 		<repository>
 			<id>apache-snapshots</id>
 			<name>Apache Snapshots</name>
-			<url>http://repository.apache.org/snapshots/</url>
+			<url>https://repository.apache.org/snapshots/</url>
 		</repository>
 	</repositories>
 
@@ -77,7 +77,7 @@
 		<dependency>
 			<artifactId>connector-rest</artifactId>
 			<groupId>com.evolveum.polygon</groupId>
-			<version>1.4.2.18</version>
+			<version>1.5.1.3</version>
 		</dependency>
 <!--		<dependency>
 			<groupId>net.tirasa.connid</groupId>
@@ -88,7 +88,7 @@
 <dependency>
     <groupId>net.tirasa.connid</groupId>
     <artifactId>connector-framework</artifactId>
-    <version>1.4.3.0</version>
+    <version>1.5.1.10</version>
 </dependency>
 
 		<dependency>

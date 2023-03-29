@@ -21,6 +21,7 @@ package com.evolveum.polygon.connector.gitlab.rest;
  */
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -189,7 +190,7 @@ public class GroupProcessing extends GroupOrProjectProcessing {
 		LOGGER.info("Start createOrUpdateGroup, Uid: {0}, attributes: {1}", uid, attributes);
 
 		// create or update
-		Boolean create = (uid == null) ? true : false;
+		boolean create = uid == null;
 
 		JSONObject json = new JSONObject();
 
@@ -319,9 +320,6 @@ public class GroupProcessing extends GroupOrProjectProcessing {
 					|| ((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_OWNER_MEMBERS)) {
 
 				List<Object> allValues = ((ContainsAllValuesFilter) query).getAttribute().getValue();
-				if (allValues == null) {
-
-				}
 
 				for (Object value : allValues) {
 					if (value == null) {
@@ -329,67 +327,56 @@ public class GroupProcessing extends GroupOrProjectProcessing {
 					}
 				}
 
-				String REGEX = "[\\[\\]]";
-				String uid = (((ContainsAllValuesFilter) query).getAttribute().getValue()).toString();
+				String uid = String.valueOf(allValues.get(0));
 
-				uid = uid.replaceAll(REGEX, "");
-
-				StringBuilder sbPath = new StringBuilder();
-				sbPath.append(USERS).append("/").append(uid).append("/").append(USERS_MEMBERSHIPS_URL);
-
-				String TYPE_MEMBERSHIPS_GROUP = "Namespace";
-				Map<Integer, Integer> groupByAccess = new HashMap<Integer, Integer>();
 				JSONArray groupsWithMPMembers = new JSONArray();
 
 				UserProcessing userProcessing = new UserProcessing(configuration, httpclient);
-				groupByAccess = userProcessing.getUserAccess(sbPath.toString(), TYPE_MEMBERSHIPS_GROUP);
+				Map<Integer, Integer> groupByAccess = userProcessing.getUserAccess(USERS + "/" + uid + "/" + USERS_MEMBERSHIPS_URL, UserProcessing.TYPE_MEMBERSHIPS_GROUP);
 
-				Iterator<Integer> it = groupByAccess.keySet().iterator();
 
-				JSONObject group = new JSONObject();
-
-				while (it.hasNext()) {
-					Object groupID = it.next();
-
-					StringBuilder sbGroupPath = new StringBuilder();
-					sbGroupPath.append(GROUPS).append("/").append(groupID);
-					
-					URIBuilder uribuilderMember = createRequestForMembers(sbGroupPath.toString());
+				for (int groupID : groupByAccess.keySet()) {
+					URIBuilder uribuilderMember = createRequestForMembers(GROUPS + "/" + groupID);
 					Map<Integer, List<String>> mapMembersGroup = getMembers(uribuilderMember);
-                    // Attribute: {Name=owner_members, Value=[57]}
-					List<String> membersGroup = null;
-					if (((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_GUEST_MEMBERS)) {
-						membersGroup = mapMembersGroup.get(10);
+
+
+					final List<String> membersGroup;
+					switch (((ContainsAllValuesFilter) query).getAttribute().getName()) {
+						case ATTR_GUEST_MEMBERS:
+							membersGroup = mapMembersGroup.get(10);
+							break;
+						case ATTR_REPORTER_MEMBERS:
+							membersGroup = mapMembersGroup.get(20);
+							break;
+						case ATTR_DEVELOPER_MEMBERS:
+							membersGroup = mapMembersGroup.get(30);
+							break;
+						case ATTR_MASTER_MEMBERS:
+							membersGroup = mapMembersGroup.get(40);
+							break;
+						case ATTR_OWNER_MEMBERS:
+							membersGroup = mapMembersGroup.get(50);
+							break;
+						default:
+							membersGroup = null;
+							break;
+
 					}
-					if (((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_REPORTER_MEMBERS)) {
-						membersGroup = mapMembersGroup.get(20);
+
+					if (membersGroup == null) {
+						continue;
 					}
-					if (((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_DEVELOPER_MEMBERS)) {
-						membersGroup = mapMembersGroup.get(30);
-					}
-					if (((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_MASTER_MEMBERS)) {
-						membersGroup = mapMembersGroup.get(40);
-					}
-					if (((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_OWNER_MEMBERS)) {
-						membersGroup = mapMembersGroup.get(50);
-					}
-					if (membersGroup != null) {
-						for (Object MPGroupMember : allValues) {
-							for (String groupMember : membersGroup) {
-								if (groupMember.equals((String) MPGroupMember)) {
-									group = findGroupByID(groupID.toString(), options);
-									groupsWithMPMembers.put(group);
-									break;
-								}
-							}
-						}
+
+					if (new HashSet<>(membersGroup).containsAll(allValues)) {
+						final JSONObject group = findGroupByID(Integer.toString(groupID), options);
+						groupsWithMPMembers.put(group);
 					}
 				}
 				LOGGER.info("groupsWithMPMembers -  members: {0}", groupsWithMPMembers);
 				processingObjectFromGET(groupsWithMPMembers, handler);
 			} else {
 				StringBuilder sb = new StringBuilder();
-				sb.append("Illegal search with attribute ").append(((ContainsFilter) query).getAttribute().getName())
+				sb.append("Illegal search with attribute ").append(((ContainsAllValuesFilter) query).getAttribute().getName())
 						.append(" for query: ").append(query);
 				LOGGER.error(sb.toString());
 				throw new InvalidAttributeValueException(sb.toString());
@@ -435,8 +422,8 @@ public class GroupProcessing extends GroupOrProjectProcessing {
 	}
 
 	private void processingObjectFromGET(JSONObject group, ResultsHandler handler, String sbPath) {
-		byte[] avaratPhoto = getAvatarPhoto(group, ATTR_AVATAR_URL, ATTR_AVATAR);
-		ConnectorObjectBuilder builder = convertGroupJSONObjectToConnectorObject(group, avaratPhoto);
+		byte[] avatarPhoto = getAvatarPhoto(group, ATTR_AVATAR_URL, ATTR_AVATAR);
+		ConnectorObjectBuilder builder = convertGroupJSONObjectToConnectorObject(group, avatarPhoto);
 		addAttributeForMembers(builder, handler, sbPath);
 		ConnectorObject connectorObject = builder.build();
 		handler.handle(connectorObject);
@@ -446,9 +433,7 @@ public class GroupProcessing extends GroupOrProjectProcessing {
 		JSONObject group;
 		for (int i = 0; i < groups.length(); i++) {
 			group = groups.getJSONObject(i);
-			StringBuilder sbPath = new StringBuilder();
-			sbPath.append(GROUPS).append("/").append(group.get(UID));
-			processingObjectFromGET(group, handler, sbPath.toString());
+			processingObjectFromGET(group, handler, GROUPS + "/" + group.get(UID));
 		}
 	}
 

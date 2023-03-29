@@ -120,6 +120,7 @@ public class UserProcessing extends ObjectProcessing {
 	protected static final String ATTR_USER_MEMBERSHIPS_SRC_ID = "source_id";
 	protected static final String ATTR_USER_MEMBERSHIPS_ACCESS_LEVEL = "access_level";
 	protected static final String ATTR_USER_MEMBERSHIPS_SRC_TYPE = "source_type";
+	protected static final String ATTR_USER_MEMBERSHIPS_SRC_NAME = "source_name";
 
 	protected CloseableHttpClient httpclient;
 	private GitlabRestConfiguration configuration;
@@ -189,9 +190,7 @@ public class UserProcessing extends ObjectProcessing {
 		userObjClassBuilder.addAttributeInfo(attrLinkedinBuilder.build());
 
 		AttributeInfoBuilder attrIsAdminBuilder = new AttributeInfoBuilder(ATTR_IS_ADMIN);
-//		attrIsAdminBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(true).setReadable(true);
-		attrIsAdminBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(true).setReadable(false)
-				.setReturnedByDefault(false);
+		attrIsAdminBuilder.setType(Boolean.class).setCreateable(true).setUpdateable(true).setReadable(true);
 		userObjClassBuilder.addAttributeInfo(attrIsAdminBuilder.build());
 
 		// createable: TRUE && updateable: FALSE && readable: FALSE
@@ -332,7 +331,10 @@ public class UserProcessing extends ObjectProcessing {
 		putAttrIfExists(attributes, ATTR_IS_ADMIN, Boolean.class, json, ATTR_ADMIN);
 		putAttrIfExists(attributes, ATTR_CAN_CREATE_GROUP, Boolean.class, json);
 		putAttrIfExists(attributes, ATTR_EXTERNAL, Boolean.class, json);
-		putAttrIfExists(attributes, ATTR_CONFIRM, Boolean.class, json);
+
+		if (create) {
+			putAttrIfExists(attributes, ATTR_CONFIRM, Boolean.class, json);
+		}
 
 		if (!create) {
 			putAttrIfExists(attributes, ATTR_RECONFIRM, Boolean.class, json);
@@ -531,6 +533,7 @@ public class UserProcessing extends ObjectProcessing {
 		getIfExists(user, ATTR_TWO_FACTOR_ENABLED, Boolean.class, builder);
 		getIfExists(user, ATTR_EXTERNAL, Boolean.class, builder);
 		getIfExists(user, ATTR_AVATAR_URL, String.class, builder);
+		getIfExists(user, ATTR_IS_ADMIN, Boolean.class, builder);
 
 		if (user.has(ATTR_STATE)) {
 			boolean enable = STATUS_ACTIVE.equals(user.get(ATTR_STATE).toString());
@@ -797,7 +800,7 @@ public class UserProcessing extends ObjectProcessing {
 			if (groupsToManage == null) {
 				groupsOrProjects.put(groupOrProject);
 			} else if (groupsToManage
-					.containsKey(new JSONObject(groupOrProject.toString()).getString("name").toLowerCase())) {
+					.containsKey(new JSONObject(groupOrProject.toString()).getString(ATTR_USER_MEMBERSHIPS_SRC_NAME).toLowerCase())) {
 				groupsOrProjects.put(groupOrProject);
 			}
 		}
