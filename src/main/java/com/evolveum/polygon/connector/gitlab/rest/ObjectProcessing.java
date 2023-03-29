@@ -205,6 +205,7 @@ public class ObjectProcessing {
 		LOGGER.info("response: {0}", response);
 
 		processResponseErrors(response);
+		
 
 		if (!parseResult) {
 			return null;
@@ -325,6 +326,7 @@ public class ObjectProcessing {
 		// create URI for request
 		if (create) {
 			uriBuilder.setPath(path);
+			LOGGER.info("CREATE POST REQUEST FOR: {0} ", uriBuilder);
 		} else {
 			StringBuilder sbPath = new StringBuilder();
 			sbPath.append(path).append("/").append(uid.getUidValue());
@@ -474,6 +476,30 @@ public class ObjectProcessing {
 			throw new ConnectorException(sb.toString(), e);
 		}
 	}
+	
+	protected int getTotalPagesByPath(String path) {
+		LOGGER.info("getTotalPagesByPath path {0}", path);
+		URIBuilder uribuilder = getURIBuilder();
+		uribuilder.clearParameters();
+		int totalPagesByPath;
+		uribuilder.setPath(path);
+		uribuilder.setParameter(PER_PAGE, "100");
+
+		try {
+			URI uri = uribuilder.build();
+			// Get X-Total-Pages
+			HttpRequestBase totalPagesrequest = new HttpGet(uri);
+			totalPagesByPath = getTotalPages(totalPagesrequest);
+
+			return totalPagesByPath;
+
+		} catch (URISyntaxException e) {
+			StringBuilder sb = new StringBuilder();
+			sb.append("It was not possible create URI from UriBuider:").append(uriBuilder).append(";")
+					.append(e.getLocalizedMessage());
+			throw new ConnectorException(sb.toString(), e);
+		}
+	}
 
 	protected Object executeGetRequest(String path, Map<String, String> parameters, OperationOptions options,
 			Boolean resultIsArray) {
@@ -516,7 +542,7 @@ public class ObjectProcessing {
 					if (options == null || options.getPageSize() == null) {
 						uribuilder.addParameter(PER_PAGE, "100");
 					}
-					for (int i = 0; i < totalPages; i++) {
+					for (int i = 1; i <= totalPages; i++) {
 						URI uriPaged = uribuilder.setParameter(PAGE, Integer.toString(i)).build();
 						HttpRequestBase requestPaged = new HttpGet(uriPaged);
 						JSONArray responcePaged = callRequestForJSONArray(requestPaged, true);

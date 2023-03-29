@@ -59,6 +59,7 @@ public class GroupProcessing extends GroupOrProjectProcessing {
 	private static final String ATTR_FULL_NAME = "full_name";
 	private static final String ATTR_FULL_PATH = "full_path";
 
+	
 	public GroupProcessing(GitlabRestConfiguration configuration, CloseableHttpClient httpclient) {
 		super(configuration, httpclient);
 	}
@@ -251,7 +252,7 @@ public class GroupProcessing extends GroupOrProjectProcessing {
 		getIfExists(group, ATTR_PARENT_ID, Integer.class, builder);
 		getIfExists(group, ATTR_FULL_NAME, String.class, builder);
 		getIfExists(group, ATTR_FULL_PATH, String.class, builder);
-
+		
 		getMultiIfExists(group, ATTR_PROJECTS, builder);
 		getMultiIfExists(group, ATTR_SHARED_PROJECTS, builder);
 
@@ -339,7 +340,6 @@ public class GroupProcessing extends GroupOrProjectProcessing {
 				String TYPE_MEMBERSHIPS_GROUP = "Namespace";
 				Map<Integer, Integer> groupByAccess = new HashMap<Integer, Integer>();
 				JSONArray groupsWithMPMembers = new JSONArray();
-				Integer countOfSameMember = 0;
 
 				UserProcessing userProcessing = new UserProcessing(configuration, httpclient);
 				groupByAccess = userProcessing.getUserAccess(sbPath.toString(), TYPE_MEMBERSHIPS_GROUP);
@@ -353,10 +353,10 @@ public class GroupProcessing extends GroupOrProjectProcessing {
 
 					StringBuilder sbGroupPath = new StringBuilder();
 					sbGroupPath.append(GROUPS).append("/").append(groupID);
-
+					
 					URIBuilder uribuilderMember = createRequestForMembers(sbGroupPath.toString());
 					Map<Integer, List<String>> mapMembersGroup = getMembers(uribuilderMember);
-
+                    // Attribute: {Name=owner_members, Value=[57]}
 					List<String> membersGroup = null;
 					if (((ContainsAllValuesFilter) query).getAttribute().getName().equals(ATTR_GUEST_MEMBERS)) {
 						membersGroup = mapMembersGroup.get(10);
@@ -377,14 +377,11 @@ public class GroupProcessing extends GroupOrProjectProcessing {
 						for (Object MPGroupMember : allValues) {
 							for (String groupMember : membersGroup) {
 								if (groupMember.equals((String) MPGroupMember)) {
-									countOfSameMember++;
+									group = findGroupByID(groupID.toString(), options);
+									groupsWithMPMembers.put(group);
 									break;
 								}
 							}
-						}
-						if (countOfSameMember == allValues.size()) {
-							group = findGroupByID(groupID.toString(), options);
-							groupsWithMPMembers.put(group);
 						}
 					}
 				}
